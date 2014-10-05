@@ -12,8 +12,6 @@ public class SoundBank {
 
 	
 	public static void sound_play_eat(){
-		new Thread(){
-			   public void run(){
 		try
 	    {
 	        Clip clip = AudioSystem.getClip();
@@ -24,8 +22,6 @@ public class SoundBank {
 	    {
 	        exc.printStackTrace(System.out);
 	    }
-			   }
-		}.start();
 	}
 	public static void sound_play_death(){
 		try
@@ -40,20 +36,14 @@ public class SoundBank {
 	    }
 	}
 	public static void sound_play_theme(){
-		new Thread(){
-			   public void run(){
-				   try
-				    {
-				        Clip clip = AudioSystem.getClip();
-				        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_theme.wav")));
-				        clip.start();
-				    }
-				    catch (Exception exc)
-				    {
-				        exc.printStackTrace(System.out);
-				    }
-			   }
-		}.start(); 
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(new File(
+					"src/resources/sound_theme.wav")));
+			clip.start();
+		} catch (Exception exc) {
+			exc.printStackTrace(System.out);
+		}
 		
 	}
 	public static void sound_play_simpleTheme(){
