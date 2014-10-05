@@ -1,24 +1,72 @@
 package platform;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import java.io.*;
+import javax.sound.sampled.*;
+
 
 public class SoundBank {
 	
 	public SoundBank(){
 		
 	}
+
 	
 	public static void sound_play_eat(){
-		 try {
-		        Clip clip = AudioSystem.getClip();
-		        AudioInputStream inputStream = AudioSystem.getAudioInputStream(Launch.class.getResourceAsStream("src/resources/Food_Sound.wav"));
-		        clip.open(inputStream);
-		        clip.start(); 
-		      } catch (Exception e) {
-		        System.err.println(e.getMessage());
-		      }
+		new Thread(){
+			   public void run(){
+		try
+	    {
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_food.wav")));
+	        clip.start();
+	    }
+	    catch (Exception exc)
+	    {
+	        exc.printStackTrace(System.out);
+	    }
+			   }
+		}.start();
+	}
+	public static void sound_play_death(){
+		try
+	    {
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_death.wav")));
+	        clip.start();
+	    }
+	    catch (Exception exc)
+	    {
+	        exc.printStackTrace(System.out);
+	    }
+	}
+	public static void sound_play_theme(){
+		new Thread(){
+			   public void run(){
+				   try
+				    {
+				        Clip clip = AudioSystem.getClip();
+				        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_theme.wav")));
+				        clip.start();
+				    }
+				    catch (Exception exc)
+				    {
+				        exc.printStackTrace(System.out);
+				    }
+			   }
+		}.start(); 
+		
+	}
+	public static void sound_play_simpleTheme(){
+		try
+	    {
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_theme_simple.wav")));
+	        clip.start();
+	    }
+	    catch (Exception exc)
+	    {
+	        exc.printStackTrace(System.out);
+	    }
 	}
 
 }

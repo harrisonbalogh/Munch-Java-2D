@@ -7,6 +7,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import platform.SoundBank;
+
 public class Food extends Entity{
 
 	public static CopyOnWriteArrayList<Food> food = new CopyOnWriteArrayList<Food>();
@@ -43,6 +45,7 @@ public class Food extends Entity{
 	
 	public void eat(){
 		food.remove(this);
+		SoundBank.sound_play_eat();
 	}
 
 	@Override

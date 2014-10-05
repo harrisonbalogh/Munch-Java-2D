@@ -116,7 +116,7 @@ public class InterfaceItem {
 	}
 	
 	public void runMenuScene(){
-		// You have to
+		SoundBank.sound_play_theme();
 		button_back.setVisible(false);
 		button_reload.setVisible(false);
 		text_food.setVisible(false);
@@ -134,6 +134,7 @@ public class InterfaceItem {
 		button_credits.setVisible(true);
 	}
 	public void runPlayScene(){
+		//SoundBank.sound_play_simpleTheme();
 		text_food.setVisible(true);
 		text_score.setVisible(true);
 		text_food.setText("Food: 0/10");

@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import platform.Launch;
+import platform.SoundBank;
 
 public class Player extends Entity{
 	
@@ -33,6 +34,8 @@ public class Player extends Entity{
 	}
 	
 	public void death(){
+		SoundBank.sound_play_death();
+		playing = false;
 	}
 	public void grow(){
 		Food.food.clear();
@@ -53,7 +56,6 @@ public class Player extends Entity{
 	@Override
 	public void update() {
 		if(getY()+getSize() <= 0){
-			playing = false;
 			death();
 			return;
 		}
