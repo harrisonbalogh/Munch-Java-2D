@@ -7,6 +7,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import platform.GameClock;
+import platform.Launch;
 import platform.SoundBank;
 
 public class Food extends Entity{
@@ -23,6 +25,7 @@ public class Food extends Entity{
 		this.rect = new Rectangle(x, y, size, size);
 		img = Toolkit.getDefaultToolkit().getImage("images/charSpriteSheet.png");
 		food.add(this);
+		alive = true;
 	}
 	
 	public Food(int size, Image img){
@@ -31,15 +34,29 @@ public class Food extends Entity{
 	
 	@Override
 	public void draw(Graphics g) {
-		update();
-		// The below line doesn't draw any image since there aren't any food file images in the resources folder yet.
 		g.drawImage(img, x, y, x + size, y + size, SPRITESHEET_X, SPRITESHEET_Y, SPRITESHEET_X + size, SPRITESHEET_Y + size, null, null);
 		g.setColor(Color.black);
 		g.drawRect(x,  y, size, size);
+		update();
 	}
 
 	@Override
 	public void update() {
+		setY(getY() - GameClock.MOVEMENT_SPEED);
+		if (getX()+getSize() <= 0) food.remove(this);
+		if(rect.intersects(Launch.p.rect)){
+			if(Launch.p.getSize() >= size){
+				Launch.p.setScore(Launch.p.getScore() + size/getSize() * 100);
+				Launch.p.setFood(Launch.p.getFood() + getSize()/Launch.GRID_LENGTH);
+				if(Launch.p.getFood() >= Launch.p.getFoodNeeded()){
+					Launch.p.setGrowing();
+				}
+				Launch.ui.text_score.setText("Score: " + Launch.p.getScore());
+				Launch.ui.text_food.setText("Food: " + food + "/" + Launch.p.getFoodNeeded());
+				eat();
+			}
+			else setY(getY()-Launch.MOVEMENT_SPEED);
+		}
 		animate();
 	}
 	

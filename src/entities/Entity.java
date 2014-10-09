@@ -10,6 +10,7 @@ public abstract class Entity {
 	protected int size;
 	protected Image img;
 	public Rectangle rect;
+	protected boolean alive;
 
 	abstract public void draw(Graphics g);
 	abstract public void update();

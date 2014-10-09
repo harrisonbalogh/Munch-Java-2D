@@ -15,7 +15,7 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-            if(Launch.p.getPlaying() && !Launch.p.getGrowing()) Launch.p.moveLeft();
+            if(Launch.playing && !Launch.p.getGrowing()) Launch.p.moveLeft();
         }
     }
 	
@@ -28,7 +28,7 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-			if(Launch.p.getPlaying() && !Launch.p.getGrowing()) Launch.p.moveRight();
+			if(Launch.playing && !Launch.p.getGrowing()) Launch.p.moveRight();
         }
     }
 	
@@ -41,8 +41,8 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-			if( Launch.p.getPlaying()) Launch.p.setPlaying(false);
-			if(!Launch.p.getPlaying()) Launch.p.setPlaying(true );
+			if( Launch.playing) Launch.playing = false;
+			if(!Launch.playing) Launch.playing = true;
         }
     }
 	

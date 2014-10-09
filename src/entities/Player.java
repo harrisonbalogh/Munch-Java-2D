@@ -13,7 +13,6 @@ public class Player extends Entity{
 	private int food;
 	private int foodNeeded;
 	private boolean growing;
-	private boolean playing;
 	
 	private static final int SPRITESHEET_X = 25;
 	private static final int SPRITESHEET_Y = 25;
@@ -27,6 +26,7 @@ public class Player extends Entity{
 		this.growing = false;
 		foodNeeded = this.size/Launch.GRID_LENGTH * 10;
 		img = Toolkit.getDefaultToolkit().getImage("src/resources/entity_player.png");
+		alive = true;
 	}
 	
 	public Player(){
@@ -35,9 +35,10 @@ public class Player extends Entity{
 	
 	public void death(){
 		SoundBank.sound_play_death();
-		playing = false;
+		alive = false;
 	}
 	public void grow(){
+		growing = true;
 		Food.food.clear();
 		setSize(getSize() + Launch.GRID_LENGTH);
 		foodNeeded = getSize()/Launch.GRID_LENGTH * 10;
@@ -49,8 +50,8 @@ public class Player extends Entity{
 
 	@Override
 	public void draw(Graphics g) {
-		update();
 		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1), 0, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1) + SPRITESHEET_X*(size/Launch.GRID_LENGTH), SPRITESHEET_Y*(size/Launch.GRID_LENGTH), null, null);
+		update();
 	}
 
 	@Override
@@ -58,23 +59,6 @@ public class Player extends Entity{
 		if(getY()+getSize() <= 0){
 			death();
 			return;
-		}
-		for(Food f : Food.food){
-			if (f.getX()+f.getSize() <= 0) Food.food.remove(f);
-			if(rect.intersects(f.rect)){
-				if(size >= f.size){
-					score += size/f.getSize() * 100;
-					food += f.getSize()/Launch.GRID_LENGTH;
-					if(food >= foodNeeded){
-						growing = true;
-						grow();
-					}
-					Launch.ui.text_score.setText("Score: " + score);
-					Launch.ui.text_food.setText("Food: " + food + "/" + getFoodNeeded());
-					f.eat();
-				}
-				else setY(getY()-Launch.MOVEMENT_SPEED);
-			}
 		}
 		animate();
 	}
@@ -127,16 +111,16 @@ public class Player extends Entity{
 	public void setFoodNeeded(int foodNeeded){
 		this.foodNeeded = foodNeeded;
 	}
-	public void setGrowing(boolean growing){
-		this.growing = growing;
+	public void setGrowing(){
+		grow();
 	}
 	public boolean getGrowing(){
 		return growing;
 	}
-	public void setPlaying(boolean playing){
-		this.playing = playing;
+	public void setAlive(boolean living){
+		this.alive = living;
 	}
-	public boolean getPlaying(){
-		return playing;
+	public boolean getAlive(){
+		return alive;
 	}
 }

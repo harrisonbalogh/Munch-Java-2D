@@ -116,13 +116,14 @@ public class InterfaceItem {
 	}
 	
 	public void runMenuScene(){
+		GameClock.stopGameClock();
 		SoundBank.sound_play_theme();
 		button_back.setVisible(false);
 		button_reload.setVisible(false);
 		text_food.setVisible(false);
 		text_score.setVisible(false);
 		panel_game.setVisible(false);
-		Launch.p.setPlaying(false);
+		Launch.playing = false;
 		Food.food.clear();
 		Launch.p.setScore(0);
 		Launch.p.setFood(0);
@@ -135,11 +136,12 @@ public class InterfaceItem {
 	}
 	public void runPlayScene(){
 		//SoundBank.sound_play_simpleTheme();
+		GameClock.startGameClock();
 		text_food.setVisible(true);
 		text_score.setVisible(true);
 		text_food.setText("Food: 0/10");
 		text_score.setText("Score: 0");
-		Launch.p.setPlaying(true);
+		Launch.playing = true;
 		Launch.p.setSize(Launch.GRID_LENGTH);
 		Launch.p.setFoodNeeded(10);
 		panel_game.setVisible(true);
@@ -192,9 +194,11 @@ public class InterfaceItem {
 			super.paintComponent(g);
 			Graphics2D g2d = (Graphics2D) g.create();
 
-			if(Launch.p.getPlaying()) Launch.p.draw(g2d);
+			System.out.println("Hey");
+			
+			Launch.p.draw(g2d);
 			g2d.setColor(Color.BLACK);
-			if(!Launch.p.getPlaying() && Launch.ui.panel_game.isVisible()) g2d.drawString("GAME OVER", 155, 300);
+			if(!Launch.p.getAlive()) g2d.drawString("GAME OVER", 155, 300);
 			for(Food f : Food.food){
 				f.draw(g2d);
 			}

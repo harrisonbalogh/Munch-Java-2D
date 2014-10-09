@@ -2,17 +2,12 @@ package platform;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Random;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import entities.*;
 
 public class Launch extends JFrame{
@@ -40,20 +35,22 @@ public class Launch extends JFrame{
 	Jump to main() towards bottom... GOTO line 138
 	 */
 	
-	public static Random random = new Random(); // Library class needed for generated random numbers.
-	
 	public static Player p;
 	public static InterfaceItem ui;
+	public static GameClock gc;
+	public static boolean playing = false;
 	
-	// Constants for adjusting various application properties. Should be adjustable in-game in options menu. By adjusting gameplay difficulty.
 	// Difficulty should affect the rate the time refreshes, the max size of the foods, and the speed of the food.
 	public static final boolean ARROW_MOVEMENT 	= true;
-	public static final int WINDOW_X 			= 400;
-	public static final int WINDOW_Y			= 600;
-	public static final int WINDOW_X_OFFSET		= 0;
-	public static final int WINDOW_Y_OFFSET 	= 22;
-	public static final int GRID_LENGTH 		= 20;
-	public static final int MOVEMENT_SPEED		= 5;
+	public static final int        WINDOW_X = 400;
+	public static final int        WINDOW_Y = 600;
+	public static final int WINDOW_X_OFFSET = 0;
+	public static final int WINDOW_Y_OFFSET = 22;
+	public static final int     GRID_LENGTH = 20; // pixel width per grid space
+	public static final int  MOVEMENT_SPEED = 5;  // pixels per CLOCK_RATE
+	public static final int      CLOCK_RATE = 50; // in milliseconds
+	public static final int    SPAWN_CHANCE = 2;  // out of 10
+	public static final int   MAX_FOOD_SIZE = 5;  // in grid count number form
 	
 	
 	public Launch(){
@@ -89,37 +86,6 @@ public class Launch extends JFrame{
 		// You always set the JFrame to visible after all of its components have been added... Using: add(name_of_a_jcomponent);
 		setVisible(true);
 		
-		// The below timer will be called our game clock. Which will be used to update the positions of the "food" and used to generate new "food".
-		// The number 50 is how often the timer runs (in milliseconds).
-		Timer timer = new Timer(50, new ActionListener() {
-			@Override
-            public void actionPerformed(ActionEvent e) {
-				p.animate();
-				if(p.getPlaying()){
-					// The below two lines is our probability for generating new food... currently there's a 2/10 chance a food will be created every 50 milliseconds.
-					int produceFood = random.nextInt(10);
-					if(produceFood < 2){
-						int size = (random.nextInt(5)+1)*GRID_LENGTH;
-						int x = random.nextInt(WINDOW_X/GRID_LENGTH - size/GRID_LENGTH + 1) * GRID_LENGTH;
-						int y = WINDOW_Y;
-						boolean intersects = false;
-						Rectangle rect = new Rectangle(x, y, size, size);
-						for(Food f : Food.food)
-							if(rect.intersects(f.rect))
-								intersects = true;
-						if (!intersects)
-							new Food(x, y, size, null);
-					}
-					for(Food f : Food.food){
-						f.setY(f.getY()-MOVEMENT_SPEED);
-					}
-				}
-				//System.out.println("5/100th of a second");
-            }
-        });
-        timer.setRepeats(true);
-        timer.setCoalesce(true);
-        timer.start();
 	}
 	
 	public void paint(Graphics g) { 
@@ -142,6 +108,8 @@ public class Launch extends JFrame{
 				p = new Player();
 				// See InterfaceItem class to see all interface buttons/labels/text that are initialized when a new InterfaceItem object is instantiated.
 				ui = new InterfaceItem();
+				// Must initialize game clock here before using startGameClock() method
+				gc = new GameClock();
 				// The Launch class extends a JFrame... so the below line creates a JFrame... GOTO line 62
 				Launch la = new Launch();
 				la.setVisible(true);
