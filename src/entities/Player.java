@@ -13,6 +13,7 @@ public class Player extends Entity{
 	private int food;
 	private int foodNeeded;
 	private boolean growing;
+	private boolean alive;
 	
 	private static final int SPRITESHEET_X = 25;
 	private static final int SPRITESHEET_Y = 25;
@@ -30,7 +31,7 @@ public class Player extends Entity{
 	}
 	
 	public Player(){
-		this(300, 150, Launch.GRID_LENGTH);
+		this(Launch.WINDOW_X/2, 150, Launch.GRID_LENGTH);
 	}
 	
 	public void death(){
@@ -51,7 +52,7 @@ public class Player extends Entity{
 	@Override
 	public void draw(Graphics g) {
 		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1), 0, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1) + SPRITESHEET_X*(size/Launch.GRID_LENGTH), SPRITESHEET_Y*(size/Launch.GRID_LENGTH), null, null);
-		update();
+		if(Launch.playing && alive) update();
 	}
 
 	@Override

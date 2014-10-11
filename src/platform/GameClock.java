@@ -26,8 +26,6 @@ public class GameClock {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				Launch.p.animate();
-				for (Food f : Food.food) f.update();
 				if (random.nextInt(10) < SPAWN_CHANCE) {
 					int size = (random.nextInt(MAX_FOOD_SIZE) + 1) * GRID_LENGTH;
 					int x = (random.nextInt(Launch.WINDOW_X / GRID_LENGTH - 1 + size/GRID_LENGTH - 1) - size/GRID_LENGTH + 1) * GRID_LENGTH;

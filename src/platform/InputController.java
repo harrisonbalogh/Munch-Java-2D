@@ -41,8 +41,8 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-			if( Launch.playing) Launch.playing = false;
-			if(!Launch.playing) Launch.playing = true;
+			if( Launch.playing && Launch.p.getAlive()) Launch.playing = false;
+			else if(!Launch.playing && Launch.p.getAlive()) Launch.playing = true;
         }
     }
 	

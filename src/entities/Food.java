@@ -6,13 +6,11 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import platform.GameClock;
 import platform.Launch;
 import platform.SoundBank;
 
 public class Food extends Entity{
-
+	
 	public static CopyOnWriteArrayList<Food> food = new CopyOnWriteArrayList<Food>();
 	
 	private static final int SPRITESHEET_X = 0;
@@ -25,7 +23,6 @@ public class Food extends Entity{
 		this.rect = new Rectangle(x, y, size, size);
 		img = Toolkit.getDefaultToolkit().getImage("images/charSpriteSheet.png");
 		food.add(this);
-		alive = true;
 	}
 	
 	public Food(int size, Image img){
@@ -37,13 +34,13 @@ public class Food extends Entity{
 		g.drawImage(img, x, y, x + size, y + size, SPRITESHEET_X, SPRITESHEET_Y, SPRITESHEET_X + size, SPRITESHEET_Y + size, null, null);
 		g.setColor(Color.black);
 		g.drawRect(x,  y, size, size);
-		update();
+		if(Launch.playing) update();
 	}
-
+	
 	@Override
 	public void update() {
-		setY(getY() - GameClock.MOVEMENT_SPEED);
-		if (getX()+getSize() <= 0) food.remove(this);
+		setY(getY() - Launch.MOVEMENT_SPEED);
+		// if (getX()+getSize() <= 0) food.remove(this); // BROKEN
 		if(rect.intersects(Launch.p.rect)){
 			if(Launch.p.getSize() >= size){
 				Launch.p.setScore(Launch.p.getScore() + size/getSize() * 100);
@@ -52,10 +49,10 @@ public class Food extends Entity{
 					Launch.p.setGrowing();
 				}
 				Launch.ui.text_score.setText("Score: " + Launch.p.getScore());
-				Launch.ui.text_food.setText("Food: " + food + "/" + Launch.p.getFoodNeeded());
+				Launch.ui.text_food.setText("Food: " + Launch.p.getFood() + "/" + Launch.p.getFoodNeeded());
 				eat();
 			}
-			else setY(getY()-Launch.MOVEMENT_SPEED);
+			else Launch.p.setY(Launch.p.getY()-Launch.MOVEMENT_SPEED);
 		}
 		animate();
 	}

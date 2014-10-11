@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import entities.Food;
+import entities.Player;
 
 public class InterfaceItem {
 	public JPanel panel_menu 		= new JPanel(new BorderLayout());
@@ -45,7 +46,10 @@ public class InterfaceItem {
 		button_play.setBounds(87, 237, 229, 39);
 		button_play.setPressedIcon(new ImageIcon("src/resources/button_play_pressed.png"));
 		button_play.setRolloverIcon(new ImageIcon("src/resources/button_play_rollover.png"));
-		button_play.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runPlayScene();}});
+		button_play.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){
+			endMenuScene();
+			runPlayScene();
+		}});
 		panel_menu.add(button_play);
 		button_stats.setBounds(87, 291, 229, 39);
 		button_stats.setPressedIcon(new ImageIcon("src/resources/button_stats_pressed.png"));
@@ -65,12 +69,20 @@ public class InterfaceItem {
 		button_back.setBounds(0, 561, 39, 39);
 		button_back.setPressedIcon(new ImageIcon("src/resources/button_back_pressed.png"));
 		button_back.setRolloverIcon(new ImageIcon("src/resources/button_back_rollover.png"));
-		button_back.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runMenuScene();}});
+		button_back.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){
+			endStatsScene();
+			endCreditsScene();
+			endAboutScene();
+			endPlayScene();
+			runMenuScene();
+		}});
+		button_back.setVisible(false);
 		panel_menu.add(button_back);
 		button_reload.setBounds(39, 561, 39, 39);
 		button_reload.setPressedIcon(new ImageIcon("src/resources/button_reload_pressed.png"));
 		button_reload.setRolloverIcon(new ImageIcon("src/resources/button_reload_rollover.png"));
 		button_reload.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runPlayScene();}});
+		button_reload.setVisible(false);
 		panel_menu.add(button_reload);
 		
 		text_score.setBounds(88, 568, 150, 25);
@@ -78,6 +90,7 @@ public class InterfaceItem {
 		text_score.setBackground(Color.WHITE);
 		text_score.setEditable(false);
 		text_score.setHighlighter(null);
+		text_score.setVisible(false);
 		text_score.setFont(new Font("LeviWindows", Font.PLAIN, 35));
 		panel_menu.add(text_score);
 		text_food.setBounds(248, 568, 115, 25);
@@ -85,6 +98,7 @@ public class InterfaceItem {
 		text_food.setBackground(Color.WHITE);
 		text_food.setEditable(false);
 		text_food.setHighlighter(null);
+		text_food.setVisible(false);
 		text_food.setFont(new Font("LeviWindows", Font.PLAIN, 35));
 		panel_menu.add(text_food);
 		scene_play.setVisible(false);
@@ -94,7 +108,7 @@ public class InterfaceItem {
 		scene_logo.setVisible(false);
 		panel_menu.add(scene_logo);
 		scene_menu.setBounds(0, 0, Launch.WINDOW_X, Launch.WINDOW_Y);
-		scene_menu.setVisible(true);
+		scene_menu.setVisible(false);
 		panel_menu.add(scene_menu);
 		scene_about.setBounds(0, 0, Launch.WINDOW_X, Launch.WINDOW_Y);
 		scene_about.setVisible(false);
@@ -118,21 +132,22 @@ public class InterfaceItem {
 	public void runMenuScene(){
 		GameClock.stopGameClock();
 		SoundBank.sound_play_theme();
-		button_back.setVisible(false);
-		button_reload.setVisible(false);
-		text_food.setVisible(false);
-		text_score.setVisible(false);
-		panel_game.setVisible(false);
 		Launch.playing = false;
 		Food.food.clear();
 		Launch.p.setScore(0);
 		Launch.p.setFood(0);
 		scene_menu.setVisible(true);
-		scene_play.setVisible(false);
 		button_play.setVisible(true);
 		button_stats.setVisible(true);
 		button_about.setVisible(true);
 		button_credits.setVisible(true);
+	}
+	private void endMenuScene(){
+		scene_menu.setVisible(false);
+		button_play.setVisible(false);
+		button_stats.setVisible(false);
+		button_about.setVisible(false);
+		button_credits.setVisible(false);
 	}
 	public void runPlayScene(){
 		//SoundBank.sound_play_simpleTheme();
@@ -141,44 +156,49 @@ public class InterfaceItem {
 		text_score.setVisible(true);
 		text_food.setText("Food: 0/10");
 		text_score.setText("Score: 0");
+		Food.food.clear();
+		Launch.p = new Player();
 		Launch.playing = true;
-		Launch.p.setSize(Launch.GRID_LENGTH);
-		Launch.p.setFoodNeeded(10);
-		panel_game.setVisible(true);
 		button_back.setLocation(0, 561);
 		button_reload.setLocation(39, 561);
-		scene_menu.setVisible(false);
+		panel_game.setVisible(true);
 		scene_play.setVisible(true);
 		button_back.setVisible(true);
 		button_reload.setVisible(true);
-
+	}
+	private void endPlayScene(){
+		GameClock.stopGameClock();
+		text_food.setVisible(false);
+		text_score.setVisible(false);
+		panel_game.setVisible(false);
+		button_reload.setVisible(false);
+		button_back.setVisible(false);
+		scene_play.setVisible(false);
 	}
 	public void runStatsScene(){
 		scene_stats.setVisible(true);
-		scene_menu.setVisible(false);
-		button_play.setVisible(false);
-		button_stats.setVisible(false);
-		button_about.setVisible(false);
-		button_credits.setVisible(false);
 		button_back.setVisible(true);
+	}
+	private void endStatsScene(){
+		scene_stats.setVisible(false);
+		button_back.setVisible(false);
 	}
 	public void runAboutScene(){
 		scene_about.setVisible(true);
-		scene_menu.setVisible(false);
-		button_play.setVisible(false);
-		button_stats.setVisible(false);
-		button_about.setVisible(false);
-		button_credits.setVisible(false);
 		button_back.setVisible(true);
+	}
+	private void endAboutScene(){
+		scene_about.setVisible(false);
+		button_back.setVisible(false);
+		
 	}
 	public void runCreditsScene(){
 		scene_credits.setVisible(true);
-		scene_menu.setVisible(false);
-		button_play.setVisible(false);
-		button_stats.setVisible(false);
-		button_about.setVisible(false);
-		button_credits.setVisible(false);
 		button_back.setVisible(true);
+	}
+	private void endCreditsScene(){
+		scene_credits.setVisible(false);
+		button_back.setVisible(false);
 	}
 	
 	public static class GamePanel extends JPanel {
@@ -193,16 +213,19 @@ public class InterfaceItem {
 		public void paintComponent(Graphics g){
 			super.paintComponent(g);
 			Graphics2D g2d = (Graphics2D) g.create();
-
-			System.out.println("Hey");
 			
 			Launch.p.draw(g2d);
 			g2d.setColor(Color.BLACK);
 			if(!Launch.p.getAlive()) g2d.drawString("GAME OVER", 155, 300);
+			else if(!Launch.playing) g2d.drawString("PAUSED", 155, 300);
 			for(Food f : Food.food){
 				f.draw(g2d);
 			}
 			g2d.dispose();
+			try {
+		    	Thread.sleep(10);
+		    	}
+		    	catch(InterruptedException ex) {}
 	    }		
 	}
 }

@@ -47,7 +47,7 @@ public class Launch extends JFrame{
 	public static final int WINDOW_X_OFFSET = 0;
 	public static final int WINDOW_Y_OFFSET = 22;
 	public static final int     GRID_LENGTH = 20; // pixel width per grid space
-	public static final int  MOVEMENT_SPEED = 5;  // pixels per CLOCK_RATE
+	public static final int  MOVEMENT_SPEED = 2;  // pixels per repaint rate
 	public static final int      CLOCK_RATE = 50; // in milliseconds
 	public static final int    SPAWN_CHANCE = 2;  // out of 10
 	public static final int   MAX_FOOD_SIZE = 5;  // in grid count number form
@@ -63,7 +63,7 @@ public class Launch extends JFrame{
 		setLayout(null);
 		setResizable(false);
 		
-		// The next set of code adds two JPanel's to the JFrame and adds basically KeyListeners (In this case called Key Bindings) to those JPanels.
+		// The next set of code adds two JPanel's to the JFrame and adds the advanced equivalent of KeyListeners (In this case called Key Bindings) to those JPanels.
 		getContentPane().add(ui.panel_game);
 		getContentPane().add(ui.panel_menu);
 		// We use KeyBindings below instead of KeyListeners because KeyListeners rely on a JComponent being "focused" upon. Whenever a button is clicked
@@ -82,6 +82,8 @@ public class Launch extends JFrame{
 			in.put( KeyStroke.getKeyStroke('d'), "doD_Pressed");
 			am.put( "doD_Pressed", new InputController.D_Pressed());
 		}
+		in.put(KeyStroke.getKeyStroke('p'), "doP_Pressed");
+		am.put( "doP_Pressed", new InputController.P_Pressed());
 		
 		// You always set the JFrame to visible after all of its components have been added... Using: add(name_of_a_jcomponent);
 		setVisible(true);
@@ -92,7 +94,7 @@ public class Launch extends JFrame{
 		// Paint currently does nothing by our JFrame, GOTO bottom of InterfaceItem class to see where painting of food and players is done.
 		super.paint(g);
 		paintComponent(g);
-		
+
 	}
 	
 	public void paintComponent(Graphics g){
