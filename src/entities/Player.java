@@ -4,6 +4,8 @@ import java.awt.Graphics;
 
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+
+import platform.InterfaceItem;
 import platform.Launch;
 import platform.SoundBank;
 
@@ -31,7 +33,7 @@ public class Player extends Entity{
 	}
 	
 	public Player(){
-		this(Launch.WINDOW_X/2, 150, Launch.GRID_LENGTH);
+		this(InterfaceItem.WINDOW_X/2, 150, Launch.GRID_LENGTH);
 	}
 	
 	public void death(){
@@ -44,7 +46,7 @@ public class Player extends Entity{
 		setSize(getSize() + Launch.GRID_LENGTH);
 		foodNeeded = getSize()/Launch.GRID_LENGTH * 10;
 		food = 0;
-		if(x < Launch.WINDOW_X - size)
+		if(x < InterfaceItem.WINDOW_X - size)
 			moveLeft();
 		growing = false;
 	}
@@ -71,7 +73,7 @@ public class Player extends Entity{
 	
 	public void moveRight(){
 		// moveRight() and moveLeft() methods could be moved to the update() method and check if left or right arrow keys are held down.
-		if(x < Launch.WINDOW_X - size){
+		if(x < InterfaceItem.WINDOW_X - size){
 			boolean success = true;
 			int x1 = getX() + Launch.GRID_LENGTH;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());

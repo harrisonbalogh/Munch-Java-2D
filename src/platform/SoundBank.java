@@ -12,14 +12,12 @@ public class SoundBank {
 
 	
 	public static void sound_play_eat(){
-		try
-	    {
+		try {
 	        Clip clip = AudioSystem.getClip();
 	        clip.open(AudioSystem.getAudioInputStream(new File("src/resources/sound_food.wav")));
 	        clip.start();
 	    }
-	    catch (Exception exc)
-	    {
+	    catch (Exception exc){
 	        exc.printStackTrace(System.out);
 	    }
 	}

@@ -28,8 +28,8 @@ public class GameClock {
 				
 				if (random.nextInt(10) < SPAWN_CHANCE) {
 					int size = (random.nextInt(MAX_FOOD_SIZE) + 1) * GRID_LENGTH;
-					int x = (random.nextInt(Launch.WINDOW_X / GRID_LENGTH - 1 + size/GRID_LENGTH - 1) - size/GRID_LENGTH + 1) * GRID_LENGTH;
-					int y = Launch.WINDOW_Y;
+					int x = (random.nextInt(InterfaceItem.WINDOW_X / GRID_LENGTH - 1 + size/GRID_LENGTH - 1) - size/GRID_LENGTH + 1) * GRID_LENGTH;
+					int y = InterfaceItem.WINDOW_Y;
 					Rectangle rect = new Rectangle(x, y, size, size);
 					boolean success = true;
 					for (Food f : Food.food)
