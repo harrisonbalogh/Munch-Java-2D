@@ -28,34 +28,22 @@ public class Launch{
 	public static boolean playing = false;
 	
 	public static final boolean ARROW_MOVEMENT 	= true; // Temporary. Replaced with options menu element.
-	public static final int     GRID_LENGTH = 20; // pixel width per grid space
-	public static final int  MOVEMENT_SPEED = 2;  // pixels per repaint rate
-	public static final int      CLOCK_RATE = 50; // in milliseconds
-	public static final int    SPAWN_CHANCE = 2;  // out of 10
-	public static final int   MAX_FOOD_SIZE = 5;  // in grid count number form
 	
 	public static void main(String[] args){
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 	        public void run(){
 				// Anything that needs to happen when the program is started goes here.
+				// Must initialize game clock here before using startGameClock() method
+				gc = new GameClock();
 				// New player has to be created here since InterfaceItem starts drawing all player objects at run-time.
 				p = new Player();
 				// See InterfaceItem class to see all interface buttons/labels/text that are initialized when a new InterfaceItem object is instantiated.
 				ui = new InterfaceItem();
-				// Must initialize game clock here before using startGameClock() method
-				gc = new GameClock();
 				// The below line runBlankScene() is this project's naming convention for displaying a different scene. Like About/Stats/Credits...
 				ui.runMenuScene();
 			}
 		});
 	
-	}
-	
-	public static void wait(int time){
-		try {
-	    	Thread.sleep(time);
-	    }
-	    catch(InterruptedException ex) {}
 	}
 }

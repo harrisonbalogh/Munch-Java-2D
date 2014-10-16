@@ -11,11 +11,11 @@ import entities.Food;
 
 public class GameClock {
 
-	public static final int GRID_LENGTH = Launch.GRID_LENGTH;
-	public static final int MOVEMENT_SPEED = Launch.MOVEMENT_SPEED;
-	public static final int CLOCK_RATE = Launch.CLOCK_RATE;
-	public static final int SPAWN_CHANCE = Launch.SPAWN_CHANCE;
-	public static final int MAX_FOOD_SIZE = Launch.MAX_FOOD_SIZE;
+	public int  	 gridLength = 20; // pixel width per grid space
+	public int    movementSpeed = 2;  // pixels per repaint rate
+	public int      spawnChance = 2;  // out of 10
+	public int      maxFoodSize = 5;  // in grid count number form
+	public final int CLOCK_RATE = 50; // in milliseconds
 	
 	private static Random random = new Random();
 	private static Timer gameClock;
@@ -26,9 +26,9 @@ public class GameClock {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				if (random.nextInt(10) < SPAWN_CHANCE) {
-					int size = (random.nextInt(MAX_FOOD_SIZE) + 1) * GRID_LENGTH;
-					int x = (random.nextInt(InterfaceItem.WINDOW_X / GRID_LENGTH - 1 + size/GRID_LENGTH - 1) - size/GRID_LENGTH + 1) * GRID_LENGTH;
+				if (random.nextInt(10) < spawnChance) {
+					int size = (random.nextInt(maxFoodSize) + 1) * gridLength;
+					int x = (random.nextInt(InterfaceItem.WINDOW_X / gridLength - 1 + size/gridLength - 1) - size/gridLength + 1) * gridLength;
 					int y = InterfaceItem.WINDOW_Y;
 					Rectangle rect = new Rectangle(x, y, size, size);
 					boolean success = true;

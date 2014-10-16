@@ -39,20 +39,20 @@ public class Food extends Entity{
 	
 	@Override
 	public void update() {
-		setY(getY() - Launch.MOVEMENT_SPEED);
+		setY(getY() - Launch.gc.movementSpeed);
 		// if (getX()+getSize() <= 0) food.remove(this); // BROKEN
 		if(rect.intersects(Launch.p.rect)){
 			if(Launch.p.getSize() >= size){
 				Launch.p.setScore(Launch.p.getScore() + size/getSize() * 100);
-				Launch.p.setFood(Launch.p.getFood() + getSize()/Launch.GRID_LENGTH);
+				Launch.p.setFood(Launch.p.getFood() + getSize()/Launch.gc.gridLength);
 				if(Launch.p.getFood() >= Launch.p.getFoodNeeded()){
 					Launch.p.setGrowing();
 				}
-				Launch.ui.text_score.setText("Score: " + Launch.p.getScore());
-				Launch.ui.text_food.setText("Food: " + Launch.p.getFood() + "/" + Launch.p.getFoodNeeded());
+				Launch.ui.setTextScore(Launch.p.getScore());
+				Launch.ui.setTextFood(Launch.p.getFood(), Launch.p.getFoodNeeded());
 				eat();
 			}
-			else Launch.p.setY(Launch.p.getY()-Launch.MOVEMENT_SPEED);
+			else Launch.p.setY(Launch.p.getY()-Launch.gc.movementSpeed);
 		}
 		animate();
 	}

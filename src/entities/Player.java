@@ -27,13 +27,13 @@ public class Player extends Entity{
 		this.size = size;
 		this.rect = new Rectangle(x, y, size, size);
 		this.growing = false;
-		foodNeeded = this.size/Launch.GRID_LENGTH * 10;
+		foodNeeded = this.size/Launch.gc.gridLength * 10;
 		img = Toolkit.getDefaultToolkit().getImage("src/resources/entity_player.png");
 		alive = true;
 	}
 	
 	public Player(){
-		this(InterfaceItem.WINDOW_X/2, 150, Launch.GRID_LENGTH);
+		this(InterfaceItem.WINDOW_X/2, 150, Launch.gc.gridLength);
 	}
 	
 	public void death(){
@@ -43,8 +43,8 @@ public class Player extends Entity{
 	public void grow(){
 		growing = true;
 		Food.food.clear();
-		setSize(getSize() + Launch.GRID_LENGTH);
-		foodNeeded = getSize()/Launch.GRID_LENGTH * 10;
+		setSize(getSize() + Launch.gc.gridLength);
+		foodNeeded = getSize()/Launch.gc.gridLength * 10;
 		food = 0;
 		if(x < InterfaceItem.WINDOW_X - size)
 			moveLeft();
@@ -53,7 +53,7 @@ public class Player extends Entity{
 
 	@Override
 	public void draw(Graphics g) {
-		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1), 0, SPRITESHEET_X*(size/Launch.GRID_LENGTH - 1) + SPRITESHEET_X*(size/Launch.GRID_LENGTH), SPRITESHEET_Y*(size/Launch.GRID_LENGTH), null, null);
+		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/Launch.gc.gridLength - 1), 0, SPRITESHEET_X*(size/Launch.gc.gridLength - 1) + SPRITESHEET_X*(size/Launch.gc.gridLength), SPRITESHEET_Y*(size/Launch.gc.gridLength), null, null);
 		if(Launch.playing && alive) update();
 	}
 
@@ -75,7 +75,7 @@ public class Player extends Entity{
 		// moveRight() and moveLeft() methods could be moved to the update() method and check if left or right arrow keys are held down.
 		if(x < InterfaceItem.WINDOW_X - size){
 			boolean success = true;
-			int x1 = getX() + Launch.GRID_LENGTH;
+			int x1 = getX() + Launch.gc.gridLength;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());
 			for(Food f : Food.food)
 				if(temp.intersects(f.rect) && size < f.size)
@@ -87,7 +87,7 @@ public class Player extends Entity{
 	public void moveLeft(){
 		if(x > 0){
 			boolean success = true;
-			int x1 = getX() - Launch.GRID_LENGTH;
+			int x1 = getX() - Launch.gc.gridLength;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());
 			for(Food f : Food.food)
 				if(temp.intersects(f.rect) && size < f.size)

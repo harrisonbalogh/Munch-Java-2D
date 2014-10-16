@@ -29,24 +29,23 @@ public class InterfaceItem {
 	public static final int WINDOW_X_OFFSET = 0;
 	public static final int WINDOW_Y_OFFSET = 22;
 	
-	public JFrame frame_main		= new MainFrame();
-	public JPanel panel_menu 		= new JPanel(new BorderLayout());
-	public JPanel panel_game 		= new GamePanel();
-	public JPanel panel_score		= new JPanel(new BorderLayout());
-	public JLabel scene_logo 		= new JLabel(new ImageIcon("src/resources/scene_logo.png"));
-	public JLabel scene_play 		= new JLabel(new ImageIcon("src/resources/scene_play.png"));
-	public JLabel scene_menu 		= new JLabel(new ImageIcon("src/resources/scene_menu.png"));
-	public JLabel scene_stats 		= new JLabel(new ImageIcon("src/resources/scene_stats.png"));
-	public JLabel scene_about 		= new JLabel(new ImageIcon("src/resources/scene_about.png"));
-	public JLabel scene_credits 	= new JLabel(new ImageIcon("src/resources/scene_credits.png"));
-	public JButton button_play 		= new JButton(new ImageIcon("src/resources/button_play.png"));
-	public JButton button_stats 	= new JButton(new ImageIcon("src/resources/button_stats.png"));
-	public JButton button_about 	= new JButton(new ImageIcon("src/resources/button_about.png"));
-	public JButton button_credits 	= new JButton(new ImageIcon("src/resources/button_credits.png"));
-	public JButton button_back 		= new JButton(new ImageIcon("src/resources/button_back.png"));
-	public JButton button_reload 	= new JButton(new ImageIcon("src/resources/button_reload.png"));
-	public JTextArea text_score 	= new JTextArea("0");
-	public JTextArea text_food 		= new JTextArea("0 / 10");
+	private JFrame frame_main		= new MainFrame();
+	private JPanel panel_menu 		= new JPanel(new BorderLayout());
+	private JPanel panel_game 		= new GamePanel();
+	private JLabel scene_logo 		= new JLabel(new ImageIcon("src/resources/scene_logo.png"));
+	private JLabel scene_play 		= new JLabel(new ImageIcon("src/resources/scene_play.png"));
+	private JLabel scene_menu 		= new JLabel(new ImageIcon("src/resources/scene_menu.png"));
+	private JLabel scene_stats 		= new JLabel(new ImageIcon("src/resources/scene_stats.png"));
+	private JLabel scene_about 		= new JLabel(new ImageIcon("src/resources/scene_about.png"));
+	private JLabel scene_options	= new JLabel(new ImageIcon("src/resources/scene_options.png"));
+	private JButton button_play 	= new JButton(new ImageIcon("src/resources/button_play.png"));
+	private JButton button_stats 	= new JButton(new ImageIcon("src/resources/button_stats.png"));
+	private JButton button_about 	= new JButton(new ImageIcon("src/resources/button_about.png"));
+	private JButton button_options  = new JButton(new ImageIcon("src/resources/button_options.png"));
+	private JButton button_back 	= new JButton(new ImageIcon("src/resources/button_back.png"));
+	private JButton button_reload 	= new JButton(new ImageIcon("src/resources/button_reload.png"));
+	private JTextArea text_score 	= new JTextArea("0");
+	private JTextArea text_food 	= new JTextArea("0 / 10");
 	
 
 	public InterfaceItem(){
@@ -79,14 +78,14 @@ public class InterfaceItem {
 			runAboutScene();
 		}});
 		panel_menu.add(button_about);
-		button_credits.setBounds(87, 399, 229, 39);
-		button_credits.setPressedIcon(new ImageIcon("src/resources/button_credits_pressed.png"));
-		button_credits.setRolloverIcon(new ImageIcon("src/resources/button_credits_rollover.png"));
-		button_credits.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){
+		button_options.setBounds(87, 399, 229, 39);
+		button_options.setPressedIcon(new ImageIcon("src/resources/button_options_pressed.png"));
+		button_options.setRolloverIcon(new ImageIcon("src/resources/button_options_rollover.png"));
+		button_options.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){
 			endScenes();
-			runCreditsScene();
+			runOptionsScene();
 		}});
-		panel_menu.add(button_credits);
+		panel_menu.add(button_options);
 		button_back.setBounds(0, 561, 39, 39);
 		button_back.setPressedIcon(new ImageIcon("src/resources/button_back_pressed.png"));
 		button_back.setRolloverIcon(new ImageIcon("src/resources/button_back_rollover.png"));
@@ -134,9 +133,9 @@ public class InterfaceItem {
 		scene_stats.setBounds(0, 0, WINDOW_X, WINDOW_Y);
 		scene_stats.setVisible(false);
 		panel_menu.add(scene_stats);
-		scene_credits.setBounds(0, 0, WINDOW_X, WINDOW_Y);
-		scene_credits.setVisible(false);
-		panel_menu.add(scene_credits);
+		scene_options.setBounds(0, 0, WINDOW_X, WINDOW_Y);
+		scene_options.setVisible(false);
+		panel_menu.add(scene_options);
 		
 		// The next 7 lines are properties initialized for the JFrame.
 		frame_main.setTitle("Munch");
@@ -191,14 +190,14 @@ public class InterfaceItem {
 		button_play.setVisible(true);
 		button_stats.setVisible(true);
 		button_about.setVisible(true);
-		button_credits.setVisible(true);
+		button_options.setVisible(true);
 	}
 	private void endMenuScene(){
 		scene_menu.setVisible(false);
 		button_play.setVisible(false);
 		button_stats.setVisible(false);
 		button_about.setVisible(false);
-		button_credits.setVisible(false);
+		button_options.setVisible(false);
 	}
 	public void runPlayScene(){
 		//SoundBank.sound_play_simpleTheme();
@@ -243,20 +242,26 @@ public class InterfaceItem {
 		button_back.setVisible(false);
 		
 	}
-	public void runCreditsScene(){
-		scene_credits.setVisible(true);
+	private void runOptionsScene(){
+		scene_options.setVisible(true);
 		button_back.setVisible(true);
 	}
-	private void endCreditsScene(){
-		scene_credits.setVisible(false);
+	private void endOptionsScene(){
+		scene_options.setVisible(false);
 		button_back.setVisible(false);
 	}
 	private void endScenes(){
+		endOptionsScene();
 		endMenuScene();
-		endCreditsScene();
 		endAboutScene();
 		endStatsScene();
 		endPlayScene();
+	}
+	public void setTextScore(int score){
+		text_score.setText("Score: " + Launch.p.getScore());
+	}
+	public void setTextFood(int food, int foodNeeded){
+		text_food.setText("Food: " + Launch.p.getFood() + "/" + Launch.p.getFoodNeeded());
 	}
 	
 	public static class MainFrame extends JFrame {
