@@ -1,4 +1,4 @@
-package platform;
+package entities;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -7,14 +7,15 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
-import entities.Food;
+import ui.InterfaceItem;
+
 
 public class GameClock {
 
-	public int  	 gridLength = 20; // pixel width per grid space
-	public int    movementSpeed = 2;  // pixels per repaint rate
-	public int      spawnChance = 2;  // out of 10
-	public int      maxFoodSize = 5;  // in grid count number form
+	public static int  	    gridLength = 20; // pixel width per grid space
+	public static int    movementSpeed = 2;  // pixels per repaint rate
+	public static int      spawnChance = 2;  // out of 10
+	public static int      maxFoodSize = 5;  // in grid count number form
 	public final int CLOCK_RATE = 50; // in milliseconds
 	
 	private static Random random = new Random();
@@ -46,11 +47,11 @@ public class GameClock {
 		gameClock.setCoalesce(true);
 	}
 	
-	static void startGameClock(){
+	public static void startGameClock(){
 		gameClock.start();
 	}
 	
-	static void stopGameClock(){
+	public static void stopGameClock(){
 		gameClock.stop();
 	}
 	

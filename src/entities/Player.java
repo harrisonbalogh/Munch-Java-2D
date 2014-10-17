@@ -5,11 +5,13 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 
-import platform.InterfaceItem;
 import platform.Launch;
 import platform.SoundBank;
+import ui.InterfaceItem;
 
 public class Player extends Entity{
+	
+	public static Player p = new Player();
 	
 	private int score;
 	private int food;
@@ -17,6 +19,7 @@ public class Player extends Entity{
 	private boolean growing;
 	private boolean alive;
 	
+	public static boolean playing = false;
 	private static final int SPRITESHEET_X = 25;
 	private static final int SPRITESHEET_Y = 25;
 	//private static final int SPRITESHEET_FRAMES = 0;
@@ -27,13 +30,13 @@ public class Player extends Entity{
 		this.size = size;
 		this.rect = new Rectangle(x, y, size, size);
 		this.growing = false;
-		foodNeeded = this.size/Launch.gc.gridLength * 10;
+		foodNeeded = this.size/GameClock.gridLength * 10;
 		img = Toolkit.getDefaultToolkit().getImage("src/resources/entity_player.png");
 		alive = true;
 	}
 	
 	public Player(){
-		this(InterfaceItem.WINDOW_X/2, 150, Launch.gc.gridLength);
+		this(InterfaceItem.WINDOW_X/2, 1-GameClock.gridLength, GameClock.gridLength);
 	}
 	
 	public void death(){
@@ -43,8 +46,8 @@ public class Player extends Entity{
 	public void grow(){
 		growing = true;
 		Food.food.clear();
-		setSize(getSize() + Launch.gc.gridLength);
-		foodNeeded = getSize()/Launch.gc.gridLength * 10;
+		setSize(getSize() + GameClock.gridLength);
+		foodNeeded = getSize()/GameClock.gridLength * 10;
 		food = 0;
 		if(x < InterfaceItem.WINDOW_X - size)
 			moveLeft();
@@ -53,15 +56,19 @@ public class Player extends Entity{
 
 	@Override
 	public void draw(Graphics g) {
-		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/Launch.gc.gridLength - 1), 0, SPRITESHEET_X*(size/Launch.gc.gridLength - 1) + SPRITESHEET_X*(size/Launch.gc.gridLength), SPRITESHEET_Y*(size/Launch.gc.gridLength), null, null);
-		if(Launch.playing && alive) update();
+		g.drawImage(img, x+1, y+1, x + size, y + size, SPRITESHEET_X*(size/GameClock.gridLength - 1), 0, SPRITESHEET_X*(size/GameClock.gridLength - 1) + SPRITESHEET_X*(size/GameClock.gridLength), SPRITESHEET_Y*(size/GameClock.gridLength), null, null);
+		if(playing && alive) update();
 	}
 
 	@Override
 	public void update() {
-		if(getY()+getSize() <= 0){
+		if(getY()+getSize() <= 0 && playing){
 			death();
 			return;
+		}else{
+			setScore(getScore()+1);
+			Launch.ui.setTextScore(score);
+			Launch.ui.setTextFood(this.food, foodNeeded);
 		}
 		animate();
 	}
@@ -75,7 +82,7 @@ public class Player extends Entity{
 		// moveRight() and moveLeft() methods could be moved to the update() method and check if left or right arrow keys are held down.
 		if(x < InterfaceItem.WINDOW_X - size){
 			boolean success = true;
-			int x1 = getX() + Launch.gc.gridLength;
+			int x1 = getX() + GameClock.gridLength;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());
 			for(Food f : Food.food)
 				if(temp.intersects(f.rect) && size < f.size)
@@ -87,7 +94,7 @@ public class Player extends Entity{
 	public void moveLeft(){
 		if(x > 0){
 			boolean success = true;
-			int x1 = getX() - Launch.gc.gridLength;
+			int x1 = getX() - GameClock.gridLength;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());
 			for(Food f : Food.food)
 				if(temp.intersects(f.rect) && size < f.size)
