@@ -17,7 +17,9 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-            if(Player.playing && !Player.p.getGrowing()) Player.p.moveLeft();
+			if (Player.playing && !Player.p.getGrowing())
+				Player.p.moveLeft();
+			
         }
     }
 	
@@ -30,7 +32,9 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
-			if(Player.playing && !Player.p.getGrowing()) Player.p.moveRight();
+			if (Player.playing && !Player.p.getGrowing())
+				Player.p.moveRight();
+			
         }
     }
 	
@@ -43,8 +47,9 @@ public class InputController {
 
 		public void actionPerformed( ActionEvent tf )
         {
+			
 			if(Player.playing) {
-				Launch.ui.runPlayScene();
+				Launch.ui.reload();
 			}
         }
     }

@@ -7,7 +7,7 @@ import java.awt.Toolkit;
 
 import platform.Launch;
 import platform.SoundBank;
-import ui.InterfaceItem;
+import ui.UserDisplay;
 
 public class Player extends Entity{
 	
@@ -20,8 +20,8 @@ public class Player extends Entity{
 	private boolean alive;
 	
 	public static boolean playing = false;
-	private static final int SPRITESHEET_X = 25;
-	private static final int SPRITESHEET_Y = 25;
+	private static int SPRITESHEET_X = 25;
+	private static int SPRITESHEET_Y = 25;
 	//private static final int SPRITESHEET_FRAMES = 0;
 	
 	public Player(int x, int y, int size){
@@ -33,25 +33,11 @@ public class Player extends Entity{
 		foodNeeded = this.size/GameClock.gridLength * 10;
 		img = Toolkit.getDefaultToolkit().getImage("src/resources/entity_player.png");
 		alive = true;
+		animate();
 	}
 	
 	public Player(){
-		this(InterfaceItem.WINDOW_X/2, 1-GameClock.gridLength, GameClock.gridLength);
-	}
-	
-	public void death(){
-		SoundBank.sound_play_death();
-		alive = false;
-	}
-	public void grow(){
-		growing = true;
-		Food.food.clear();
-		setSize(getSize() + GameClock.gridLength);
-		foodNeeded = getSize()/GameClock.gridLength * 10;
-		food = 0;
-		if(x < InterfaceItem.WINDOW_X - size)
-			moveLeft();
-		growing = false;
+		this(UserDisplay.WINDOW_X/2, 1-GameClock.gridLength, GameClock.gridLength);
 	}
 
 	@Override
@@ -68,19 +54,47 @@ public class Player extends Entity{
 		}else{
 			setScore(getScore()+1);
 			Launch.ui.setTextScore(score);
-			Launch.ui.setTextFood(this.food, foodNeeded);
 		}
-		animate();
 	}
 
 	@Override
 	public void animate() {
-		//You need to open a new thread and use Thread.sleep(milliseconds) to make little simple animations.
+		new Thread(){
+			public void run(){
+				boolean directionChange = false;
+				while(alive){
+					if(!directionChange) {
+						SPRITESHEET_X++;
+						if (SPRITESHEET_X > size) directionChange = !directionChange;
+					}
+					else {
+						SPRITESHEET_X--;
+						if (SPRITESHEET_X < 1) directionChange = !directionChange;
+					}
+					try{Thread.sleep(25);}catch(InterruptedException ex){};
+				}
+			}
+		}.start();
+	}
+	
+	public void death(){
+		SoundBank.sound_play_death();
+		alive = false;
+	}
+	public void grow(){
+		growing = true;
+		Food.food.clear();
+		setSize(getSize() + GameClock.gridLength);
+		foodNeeded = getSize()/GameClock.gridLength * 10;
+		food = 0;
+		if(x < UserDisplay.WINDOW_X - size)
+			moveLeft();
+		growing = false;
 	}
 	
 	public void moveRight(){
 		// moveRight() and moveLeft() methods could be moved to the update() method and check if left or right arrow keys are held down.
-		if(x < InterfaceItem.WINDOW_X - size){
+		if(x < UserDisplay.WINDOW_X - size){
 			boolean success = true;
 			int x1 = getX() + GameClock.gridLength;
 			Rectangle temp = new Rectangle(x1, getY(), getSize(), getSize());
