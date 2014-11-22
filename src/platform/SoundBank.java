@@ -32,6 +32,17 @@ public class SoundBank {
 				exc.printStackTrace(System.out);
 			}
 	}
+	public static void sound_play_menu_swipe(){
+		if (Options.effectsSound)
+			try {
+				Clip clip = AudioSystem.getClip();
+				clip.open(AudioSystem.getAudioInputStream(new File(
+						"src/resources/sound_menu_swipe.wav")));
+				clip.start();
+			} catch (Exception exc) {
+				exc.printStackTrace(System.out);
+			}
+	}
 	public static void sound_play_theme(){
 		if (Options.musicSound)
 			new Thread() {

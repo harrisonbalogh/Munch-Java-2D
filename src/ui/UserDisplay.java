@@ -3,17 +3,10 @@ package ui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import javax.imageio.ImageIO;
-import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -22,13 +15,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-
-import platform.InputController;
+import platform.SoundBank;
 import platform.Statistics;
-
 import entities.Food;
-import entities.GameClock;
+import entities.GameClocks;
 import entities.Player;
 
 public class UserDisplay {
@@ -168,23 +158,23 @@ public class UserDisplay {
 		toggle_sound_music.setBounds(223 + WINDOW_X, 224, 18, 18);
 		toggle_sound_music.setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
 		toggle_sound_music.setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
-		toggle_sound_music.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){toggleSoundMusic();}});
+		toggle_sound_music.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleSoundMusic();}});
 		toggle_sound_music.setSelected(Options.musicSound);
 		toggle_sound_effects.setBounds(223 + WINDOW_X, 245,18,18);
 		toggle_sound_effects.setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
 		toggle_sound_effects.setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
-		toggle_sound_effects.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){toggleSoundEffects();}});
+		toggle_sound_effects.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleSoundEffects();}});
 		toggle_sound_effects.setSelected(Options.effectsSound);
 		toggle_game_controls.setBounds(223 + WINDOW_X, 296, 120, 18);
 		toggle_game_controls.setSelectedIcon(new ImageIcon("src/resources/toggle_options_control_on.png"));
-		toggle_game_controls.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){switchControlScheme();}});
+		toggle_game_controls.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleControlScheme(panel_game, toggle_game_controls);}});
 		toggle_game_controls.setSelected(Options.arrowMovement);
 		for(int x = 0; x < 4; x++){
 			final int y = x;
 			toggle_game_difficulty[x].setBounds(223 + WINDOW_X + x*20, 317, 18, 18);
 			toggle_game_difficulty[x].setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
 			toggle_game_difficulty[x].setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
-			toggle_game_difficulty[x].addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){switchDifficulty(y);}});
+			toggle_game_difficulty[x].addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleDifficulty(toggle_game_difficulty, y);}});
 		}
 		toggle_game_difficulty[Options.difficulty].setSelected(true);
 		toggle_stats_reset.setBounds(223 + WINDOW_X, 365, 18, 18);
@@ -253,13 +243,14 @@ public class UserDisplay {
 		frame_main.setVisible(true);
 
 		// - - - - - A C T I O N  M A P S - - - - -
-		switchControlScheme();
+		Options.toggleControlScheme(panel_game, toggle_game_controls);
 		
 		panel_menu.setVisible(true);
 		runLogoScene();
 	}
 	
 	public void runMenuScene(){
+		SoundBank.sound_play_menu_swipe();
 			 if(openScene == "logo"){
 			//placeholder - organizational purposes
 		} 
@@ -282,7 +273,9 @@ public class UserDisplay {
 					}
 					Statistics.addStat(Player.p.getScore());
 					// SoundBank.sound_play_theme();
-					GameClock.stopGameClock();
+					GameClocks.stopSpawnClock();
+					GameClocks.stopBubbleClock();
+					panel_game.requestFocus();
 				}
 			}.start();
 		}
@@ -378,7 +371,7 @@ public class UserDisplay {
 		//openScene = "play";
 		new Thread() {
 			public void run() {
-				Food.food.clear();
+				Food.clearFood();
 				Player.p = new Player();
 				text_score.setText("Score: 0");	
 				button_play.setEnabled(false);
@@ -397,9 +390,10 @@ public class UserDisplay {
 					try{Thread.sleep(1);} catch (InterruptedException ex) {}
 				}
 				// SoundBank.sound_play_simpleTheme();
-				GameClock.startGameClock();
-				for (int x = 0; x < 300 / GameClock.movementSpeed; x++) {
-					Player.p.setY(Player.p.getY() + GameClock.movementSpeed/2);
+				GameClocks.startSpawnClock();
+				GameClocks.startBubbleClock();
+				for (int x = 0; x < 300 / GameClocks.movementSpeed; x++) {
+					Player.p.setY(Player.p.getY() + GameClocks.movementSpeed/2);
 					try{Thread.sleep(10);} catch (InterruptedException ex) {}
 				}
 				openScene = "play";
@@ -414,6 +408,7 @@ public class UserDisplay {
 		new Thread(){
 			public void run(){
 				//15 x 99 @ 216=y
+				SoundBank.sound_play_menu_swipe();
 				updateRecentStats();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
@@ -451,6 +446,7 @@ public class UserDisplay {
 		new Thread(){
 			public void run(){
 				//15 x 99 @ 216=y
+				SoundBank.sound_play_menu_swipe();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
 				button_about.setEnabled(false);
@@ -479,6 +475,7 @@ public class UserDisplay {
 		new Thread(){
 			public void run(){
 				//15 x 99 @ 312=y
+				SoundBank.sound_play_menu_swipe();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
 				button_about.setEnabled(false);
@@ -547,45 +544,6 @@ public class UserDisplay {
 		if(Options.stats_top) updateTopStats();
 		else updateRecentStats();
 	}
-	public void switchDifficulty(int difficulty){
-		toggle_game_difficulty[0].setSelected(false);
-		toggle_game_difficulty[1].setSelected(false);
-		toggle_game_difficulty[2].setSelected(false);
-		toggle_game_difficulty[3].setSelected(false);
-		toggle_game_difficulty[difficulty].setSelected(true);
-		Options.difficulty = difficulty;
-	}
-	public void toggleSoundMusic(){
-		Options.musicSound = !Options.musicSound;
-	}
-	public void toggleSoundEffects(){
-		Options.effectsSound = !Options.effectsSound;
-	}
-	public void switchControlScheme(){
-		Options.updateOptionsFile();
-		Options.arrowMovement = !Options.arrowMovement;
-		if (toggle_game_controls.isSelected()) {
-			InputMap in = panel_game.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			in.put(KeyStroke.getKeyStroke("LEFT"), null);
-			in.put(KeyStroke.getKeyStroke("RIGHT"), null);
-			
-			ActionMap am = panel_game.getActionMap();
-			in.put(KeyStroke.getKeyStroke('a'), "doA_Pressed");
-			am.put("doA_Pressed", new InputController.A_Pressed());
-			in.put(KeyStroke.getKeyStroke('d'), "doD_Pressed");
-			am.put("doD_Pressed", new InputController.D_Pressed());
-		} else {
-			InputMap in = panel_game.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			in.put(KeyStroke.getKeyStroke('a'), null);
-			in.put(KeyStroke.getKeyStroke('d'), null);
-			
-			ActionMap am = panel_game.getActionMap();
-			in.put(KeyStroke.getKeyStroke("LEFT"), "doA_Pressed");
-			am.put("doA_Pressed", new InputController.A_Pressed());
-			in.put(KeyStroke.getKeyStroke("RIGHT"), "doD_Pressed");
-			am.put("doD_Pressed", new InputController.D_Pressed());
-		}
-	}
 	public void backgroundSlideTimer(){
 		new Thread(){
 			public void run(){
@@ -600,20 +558,15 @@ public class UserDisplay {
 		new Thread() {
 			public void run() {
 				GamePanel.scrolling = false;
-				Food.food.clear();
+				Food.clearFood();
 				Player.p = new Player();
 				Player.playing = true;
 				text_score.setText("Score: 0");	
 				// SoundBank.sound_play_simpleTheme();ê
-				for (int x = 0; x < 300 / GameClock.movementSpeed; x++) {
-					Player.p.setY(Player.p.getY() + GameClock.movementSpeed/2);
+				for (int x = 0; x < 300 / GameClocks.movementSpeed; x++) {
+					Player.p.setY(Player.p.getY() + GameClocks.movementSpeed/2);
 					try{Thread.sleep(10);} catch (InterruptedException ex) {}
 				}
-				System.out.println("===================RELOAD BUTTON====================================");
-				for(JComponent c : menu_components) System.out.println("- " + c + "\n    - Focus Owner: " + c.isFocusOwner());
-				System.out.println("===================RELOAD BUTTON====================================");
-				for(JComponent c : game_components) System.out.println("- " + c + "\n    - Focus Owner: " + c.isFocusOwner());
-				System.out.println("=======================================================");
 				GamePanel.scrolling = true;
 			}
 		}.start();
@@ -623,7 +576,7 @@ public class UserDisplay {
 		int amount = 0;
 		if(openScene != "play") 
 			amount = 1;
-		else amount = GameClock.movementSpeed;
+		else amount = GameClocks.movementSpeed;
 		scene_background_1.setLocation(scene_background_1.getX(), scene_background_1.getY()-amount);
 		scene_background_2.setLocation(scene_background_2.getX(), scene_background_2.getY()-amount);
 		if(scene_background_1.getY()+scene_background_1.getHeight() < 1) 

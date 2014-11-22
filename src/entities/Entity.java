@@ -3,11 +3,12 @@ package entities;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class Entity {
-	protected int x;
-	protected int y;
-	protected int size;
+	
+	public static CopyOnWriteArrayList<Entity> entities = new CopyOnWriteArrayList<Entity>();
+	
 	protected Image img;
 	public Rectangle rect;
 
@@ -15,25 +16,26 @@ public abstract class Entity {
 	abstract public void update();
 	abstract public void animate();
 
+	public void setLocation(int x, int y){
+		rect.x = x;
+		rect.y = y;
+	}
 	public int getX() {
-		return x;
+		return rect.x;
 	}
 	public void setX(int x) {
 		rect.x = x;
-		this.x = x;
 	}
 	public int getY() {
-		return y;
+		return rect.y;
 	}
 	public void setY(int y) {
 		rect.y = y;
-		this.y = y;
 	}
 	public int getSize() {
-		return size;
+		return rect.width;
 	}
 	public void setSize(int size) {
-		this.size = size;
 		rect.width = size;
 		rect.height = size;
 	}
