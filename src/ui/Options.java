@@ -13,7 +13,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import entities.GameClocks;
+
 import platform.InputController;
+import platform.SoundBank;
 
 public class Options {
 	
@@ -35,16 +38,27 @@ public class Options {
 		checkBox[3].setSelected(false);
 		checkBox[diff].setSelected(true);
 		difficulty = diff;
+		if (difficulty > 1)
+			GameClocks.gridLength = 10; // pixel width per grid space
+		else
+			GameClocks.gridLength = 20; // pixel width per grid space
+		GameClocks.movementSpeed = 3 + difficulty;  // pixels per repaint rate
+		GameClocks.maxFoodSize = 4 + difficulty;  // in grid count number form
+		updateOptionsFile();
 	}
 	public static void toggleSoundMusic(){
+		if (musicSound) SoundBank.sound_stop_theme();
+		else SoundBank.sound_play_theme();
 		Options.musicSound = !Options.musicSound;
+		updateOptionsFile();
 	}
 	public static void toggleSoundEffects(){
 		Options.effectsSound = !Options.effectsSound;
+		updateOptionsFile();
 	}
 	public static void toggleControlScheme(JPanel panel, JCheckBox checkBox){
-		Options.updateOptionsFile();
 		Options.arrowMovement = !Options.arrowMovement;
+		updateOptionsFile();
 		if (checkBox.isSelected()) {
 			InputMap in = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 			in.put(KeyStroke.getKeyStroke("LEFT"), null);
@@ -59,6 +73,8 @@ public class Options {
 			am.put("doS_Pressed", new InputController.S_Pressed());
 			in.put(KeyStroke.getKeyStroke('w'), "doW_Pressed");
 			am.put("doW_Pressed", new InputController.W_Pressed());
+			in.put(KeyStroke.getKeyStroke('w'), "doP_Pressed");
+			am.put("doP_Pressed", new InputController.P_Pressed());
 		} else {
 			InputMap in = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 			in.put(KeyStroke.getKeyStroke('a'), null);
@@ -71,6 +87,12 @@ public class Options {
 			am.put("doA_Pressed", new InputController.A_Pressed());
 			in.put(KeyStroke.getKeyStroke("RIGHT"), "doD_Pressed");
 			am.put("doD_Pressed", new InputController.D_Pressed());
+			in.put(KeyStroke.getKeyStroke('s'), "doS_Pressed");
+			am.put("doS_Pressed", new InputController.S_Pressed());
+			in.put(KeyStroke.getKeyStroke('w'), "doW_Pressed");
+			am.put("doW_Pressed", new InputController.W_Pressed());
+			in.put(KeyStroke.getKeyStroke('p'), "doP_Pressed");
+			am.put("doP_Pressed", new InputController.P_Pressed());
 		}
 	}
 	
@@ -133,6 +155,12 @@ public class Options {
 		} catch (NumberFormatException ex) {
 			ex.printStackTrace();
 		}
+		if (difficulty > 1)
+			GameClocks.gridLength = 10; // pixel width per grid space
+		else 
+			GameClocks.gridLength = 20; // pixel width per grid space
+		GameClocks.movementSpeed = 3 + difficulty;  // pixels per repaint rate
+		GameClocks.maxFoodSize = 4 + difficulty;  // in grid count number form
 	}
 	
 }

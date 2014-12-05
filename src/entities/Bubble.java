@@ -11,7 +11,7 @@ public class Bubble extends Entity{
 	private int lifespan = 20;
 
 	private Bubble(int x, int y){
-		this.rect = new Rectangle(x, y, 4, 4);
+		this.rect = new Rectangle(x, y, Player.player1.getSize()/2, Player.player1.getSize()/2);
 		entities.add(this);
 	}
 
@@ -26,16 +26,9 @@ public class Bubble extends Entity{
 	public void update(){
 		setY(getY() - GameClocks.movementSpeed);
 		decrementLifespan();
-		if (lifespan == 10)
-			setSize(3);
-		if (lifespan == 5){
-			setX(getX() - 1);
-			setSize(2);
-		}
-		if (lifespan == 2){
-			setX(getX() + 1);
-			setSize(1);
-		}
+		setSize(getSize() - 1);
+		setX(getX() + getSize()%2);
+		
 		if(getLifespan() == 0)
 			entities.remove(this);
 	}
@@ -45,10 +38,10 @@ public class Bubble extends Entity{
 	}
 
 	public static void spawnBubble(){
-		if(!isCooldown()){
+		if(!isCooldown() && Player.isAlive() && GameClocks.movementSpeed != 0){
 			bubbleCooldown();
-			new Bubble(Player.p.getX() + Player.p.getSize()/2, 
-				       Player.p.getY() - 2);
+			new Bubble(Player.player1.getX() + Player.player1.getSize()/4, 
+				       Player.player1.getY() - Player.player1.getSize()/2);
 		}
 	}
 	public static void bubbleCooldown(){

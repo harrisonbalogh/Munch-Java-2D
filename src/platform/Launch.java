@@ -18,18 +18,18 @@ public class Launch{
 		- ...
 	 */
 
-	public static UserDisplay ui;
+	public static final int USING_RETINA_CONSTANT = 0; // set to 10 if on retina, set to 0 if not on retina
 	
-	public static final boolean ARROW_MOVEMENT 	= true; // Temporary. Replaced with options menu element.
+	public static UserDisplay ui;
 	
 	public static void main(String[] args){
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 	        public void run(){
-				// See InterfaceItem class to see all interface buttons/labels/text that are initialized when a new InterfaceItem object is instantiated.
-				ui = new UserDisplay();
 				new Statistics();
 				new Options();
+				ui = new UserDisplay();
+
 			}
 		});
 	

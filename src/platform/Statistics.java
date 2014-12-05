@@ -117,9 +117,9 @@ public class Statistics {
 			BufferedWriter bw = new BufferedWriter(fw);
 			Scanner sc = new Scanner(topRecords);
 			StringBuilder sb = new StringBuilder();
-			for(int x = 0; x < rank; x++){
-				sb.append(sc.nextLine() + "\n");
-			}
+			if(sc.hasNextLine())
+				for (int x = 0; x < rank; x++)
+					sb.append(sc.nextLine() + "\n");
 			sb.append(score + " @ " + date + "\n");
 			for(int x = rank; x < 10; x++)
 				if(sc.hasNextLine()) sb.append(sc.nextLine() + "\n");
@@ -131,7 +131,6 @@ public class Statistics {
 			System.out.println("error" + e.getMessage());
 		}
 	}
-	
 	private static void newRecentRecords(int score, String date){
 		try {
 			FileWriter fw = new FileWriter(RECENT_RECORD_FILE_NAME, false);
@@ -163,7 +162,7 @@ public class Statistics {
 		return dateFormat.format(date);
 	}
 	
-	private static void reset(){
+	public static void reset(){
 		try {
 			FileWriter fw1 = new FileWriter(RECENT_RECORD_FILE_NAME, false);
 			FileWriter fw2 = new FileWriter(TOP_RECORD_FILE_NAME, false);

@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
+import ui.MainPanel;
+
 import entities.Bubble;
 import entities.GameClocks;
 import entities.Player;
@@ -16,8 +18,8 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			if (Player.playing && !Player.p.getGrowing())
-				Player.p.moveLeft();
+			if (MainPanel.isPlaying() && !Player.player1.getGrowing())
+				Player.player1.moveLeft();
         }
     }
 	
@@ -26,8 +28,8 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			if (Player.playing && !Player.p.getGrowing())
-				Player.p.moveRight();
+			if (MainPanel.isPlaying() && !Player.player1.getGrowing())
+				Player.player1.moveRight();
         }
     }
 	
@@ -36,7 +38,7 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			if(Player.playing) {
+			if(MainPanel.isPlaying()) {
 				Launch.ui.reload();
 			}
         }
@@ -47,13 +49,13 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			new ScoreSprite(Player.p.getX() + Player.p.getSize()/2, Player.p.getY(), 100);
-			Player.p.setScore(Player.p.getScore() + (int)(Player.p.getSize()/Player.p.getSize() * 100));
-			Player.p.setFood(Player.p.getFood() + Player.p.getSize()/GameClocks.gridLength);
-			Launch.ui.setTextScore(Player.p.getScore());
+			new ScoreSprite(Player.player1.getX() + Player.player1.getSize()/2, Player.player1.getY() + Player.player1.getSize());
+			Player.player1.setScore(Player.player1.getScore() + (int)(Player.player1.getSize()/Player.player1.getSize() * 100));
+			Player.player1.setFood(Player.player1.getFood() + Player.player1.getSize()/GameClocks.gridLength);
+			Launch.ui.setTextScore(Player.player1.getScore());
 			SoundBank.sound_play_eat();
-			if(Player.p.getFood() >= Player.p.getFoodNeeded()){
-				Player.p.grow();
+			if(Player.player1.getFood() >= Player.player1.getFoodNeeded()){
+				Player.player1.grow();
 			}
         }
     }
@@ -63,8 +65,8 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			if(Player.playing) {
-				if(Player.playing){
+			if(MainPanel.isPlaying()) {
+				if(MainPanel.isPlaying()){
 					Bubble.spawnBubble();
 				}
 			}
@@ -76,10 +78,10 @@ public class InputController {
 		private static final long serialVersionUID = 1L;
 		public void actionPerformed( ActionEvent tf )
         {
-			if (Player.playing && Player.p.getAlive()) 
-				Player.playing = false;
-			else if (!Player.playing && Player.p.getAlive()) 
-				Player.playing = true;
+			if (MainPanel.isPlaying() && Player.isAlive()) 
+				MainPanel.setPlaying(false);
+			else if (!MainPanel.isPlaying() && Player.isAlive()) 
+				MainPanel.setPlaying(true);
         }
     }
 	

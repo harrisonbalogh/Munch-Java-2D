@@ -6,17 +6,22 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+
+import platform.InputController;
 import platform.SoundBank;
 import platform.Statistics;
+import entities.Entity;
 import entities.Food;
 import entities.GameClocks;
 import entities.Player;
@@ -31,16 +36,14 @@ public class UserDisplay {
 	private String openScene = "";
 	
 	private JFrame 		frame_main = new MainFrame();
-	private JPanel 		panel_menu = new JPanel(new BorderLayout());
-	private JPanel 		panel_game = new GamePanel();
-	private JLabel		scene_background_1 = new JLabel(new ImageIcon("src/resources/scene_background_1.png"));
-	private JLabel		scene_background_2 = new JLabel(new ImageIcon("src/resources/scene_background_2.png"));
+	private JPanel 		panel_main = new MainPanel();
 	private JLabel 		scene_logo = new JLabel(new ImageIcon("src/resources/scene_logo.png"));
 	private JLabel 		scene_play = new JLabel(new ImageIcon("src/resources/scene_play.png"));
 	private JLabel 		scene_menu = new JLabel(new ImageIcon("src/resources/scene_menu.png"));
 	private JLabel 		scene_stats = new JLabel(new ImageIcon("src/resources/scene_stats.png"));
 	private JLabel 		scene_about = new JLabel(new ImageIcon("src/resources/scene_about.png"));
 	private JLabel 		scene_options = new JLabel(new ImageIcon("src/resources/scene_options.png"));
+	private JLabel		popup_gameover = new JLabel(new ImageIcon("src/resources/popup_gameover.png"));
 	private JButton		button_play = new JButton(new ImageIcon("src/resources/button_play.png"));
 	private JButton 	button_stats = new JButton(new ImageIcon("src/resources/button_stats.png"));
 	private JButton 	button_stats_top = new JButton(new ImageIcon("src/resources/button_stats_top.png"));
@@ -50,19 +53,21 @@ public class UserDisplay {
 	private JButton 	button_back_game = new JButton(new ImageIcon("src/resources/button_play_back.png"));
 	private JButton 	button_back = new JButton(new ImageIcon("src/resources/button_back.png"));
 	private JButton 	button_reload = new JButton(new ImageIcon("src/resources/button_play_reload.png"));
+	private JButton		popup_gameover_button_back = new JButton(new ImageIcon("src/resources/popup_gameover_button_back.png"));
 	private JCheckBox 	toggle_sound_music = new JCheckBox(new ImageIcon("src/resources/toggle_options_off.png"));
 	private JCheckBox 	toggle_sound_effects = new JCheckBox(new ImageIcon("src/resources/toggle_options_off.png"));
 	private JCheckBox 	toggle_game_controls = new JCheckBox(new ImageIcon("src/resources/toggle_options_control_off.png"));
 	private JCheckBox 	toggle_stats_reset = new JCheckBox(new ImageIcon("src/resources/toggle_options_off.png"));
 	private JCheckBox[]	toggle_game_difficulty = new JCheckBox[4];
-	//private JLabel 		progress_play_fill = new JLabel(new ImageIcon("src/resources/progress_play_fill.png"));
-	private JTextField 	text_score = new JTextField("0");
+	private JTextArea 	text_score = new JTextArea("0");
 	private JTextArea	text_warning = new JTextArea("Pressing back while reset is toggled\n        will remove all stat history.");
 	private JTextArea[] text_stats = new JTextArea[3];
 	
-	
 	@SuppressWarnings("unchecked")
 	private ArrayList<JComponent> menu_components = new ArrayList<JComponent>(Arrays.asList(
+			text_score,
+			popup_gameover_button_back,
+			popup_gameover,
 			button_play,
 			button_stats,
 			button_stats_top,
@@ -86,24 +91,18 @@ public class UserDisplay {
 			text_stats[0] = new JTextArea(""),
 			text_stats[1] = new JTextArea(""),
 			text_stats[2] = new JTextArea(""),
-			text_warning,
-			scene_background_2,
-			scene_background_1
+			text_warning
 			));
 	@SuppressWarnings("unchecked")
 	private ArrayList<JComponent> game_components = new ArrayList<JComponent>(Arrays.asList(
-			panel_game,
 			button_reload,
 			button_back_game,
-			text_score,
 			scene_play
 			));
 	
 	public UserDisplay(){
 		// - - - - - P A N E L S - - - - -
-		panel_menu.setSize(WINDOW_X, WINDOW_Y);
-		panel_game.setBounds(WINDOW_X, 0, WINDOW_X, WINDOW_Y-39);
-		panel_game.setBackground(Color.WHITE);
+		panel_main.setSize(WINDOW_X, WINDOW_Y);
 		
 		// - - - - - B U T T O N S - - - - -
 		button_play.setBounds(14, 168, 171, 24);
@@ -143,12 +142,12 @@ public class UserDisplay {
 		button_back.setRolloverIcon(new ImageIcon("src/resources/button_back_rollover.png"));
 		button_back.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runMenuScene();}});
 		button_back.setBorderPainted(false);
-		button_back_game.setBounds(2 + WINDOW_X, 564, 34, 34);
+		button_back_game.setBounds(2, 564 + 40, 34, 34);
 		button_back_game.setPressedIcon(new ImageIcon("src/resources/button_play_back_pressed.png"));
 		button_back_game.setRolloverIcon(new ImageIcon("src/resources/button_play_back_rollover.png"));
 		button_back_game.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runMenuScene();}});
 		button_back_game.setBorderPainted(false);
-		button_reload.setBounds(38 + WINDOW_X, 564, 34, 34);
+		button_reload.setBounds(38, 564 + 40, 34, 34);
 		button_reload.setPressedIcon(new ImageIcon("src/resources/button_play_reload_pressed.png"));
 		button_reload.setRolloverIcon(new ImageIcon("src/resources/button_play_reload_rollover.png"));
 		button_reload.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){reload();}});
@@ -167,40 +166,48 @@ public class UserDisplay {
 		toggle_sound_effects.setSelected(Options.effectsSound);
 		toggle_game_controls.setBounds(223 + WINDOW_X, 296, 120, 18);
 		toggle_game_controls.setSelectedIcon(new ImageIcon("src/resources/toggle_options_control_on.png"));
-		toggle_game_controls.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleControlScheme(panel_game, toggle_game_controls);}});
-		toggle_game_controls.setSelected(Options.arrowMovement);
+		toggle_game_controls.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleControlScheme(panel_main, toggle_game_controls);}});
+		toggle_game_controls.setSelected(!Options.arrowMovement);
 		for(int x = 0; x < 4; x++){
-			final int y = x;
-			toggle_game_difficulty[x].setBounds(223 + WINDOW_X + x*20, 317, 18, 18);
-			toggle_game_difficulty[x].setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
-			toggle_game_difficulty[x].setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
-			toggle_game_difficulty[x].addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleDifficulty(toggle_game_difficulty, y);}});
-		}
+		final int y = x;
+		toggle_game_difficulty[x].setBounds(223 + WINDOW_X + x*20, 317, 18, 18);
+		toggle_game_difficulty[x].setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
+		toggle_game_difficulty[x].setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
+		toggle_game_difficulty[x].addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){Options.toggleDifficulty(toggle_game_difficulty, y);}}); }
 		toggle_game_difficulty[Options.difficulty].setSelected(true);
 		toggle_stats_reset.setBounds(223 + WINDOW_X, 365, 18, 18);
 		toggle_stats_reset.setSelectedIcon(new ImageIcon("src/resources/toggle_options_on.png"));
 		toggle_stats_reset.setPressedIcon(new ImageIcon("src/resources/toggle_options_pressed.png"));
 		toggle_stats_reset.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){resetStats();}});
 		
+		// - - - - - P O P U P S - - - - -
+		popup_gameover.setBounds(WINDOW_X/2 - 195/2, WINDOW_Y/2 - 93/2 - 350, 195, 93);
+		popup_gameover_button_back.setBounds(WINDOW_X/2 - 195/2, WINDOW_Y/2 - 93/2 - 350, 195, 93);
+		popup_gameover_button_back.setPressedIcon(new ImageIcon("src/resources/popup_gameover_button_back_pressed.png"));
+		popup_gameover_button_back.setRolloverIcon(new ImageIcon("src/resources/popup_gameover_button_back_rollover.png"));
+		popup_gameover_button_back.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e){runMenuScene();}});
+		popup_gameover_button_back.setBorderPainted(false);
+		
 		// - - - - -  T E X T  F I E L D S - - - - -
-		text_score.setBounds(88 + WINDOW_X, 568, 150, 25);
+		text_score.setBounds(7, 7 - 40, 150, 25);
 		text_score.setForeground(Color.BLACK);
 		text_score.setBackground(null);
 		text_score.setEditable(false);
 		text_score.setHighlighter(null);
-		text_score.setFont(new Font("Roboto", Font.PLAIN, 25));
-		text_score.setVisible(false);
+		text_score.setFont(new Font("Roboto", Font.PLAIN, 18));
+		text_score.setVisible(true);
+		text_score.setOpaque(false);
+		text_score.setBorder(null);
 		for(int x = 0; x < 3; x++){
-			text_stats[x].setForeground(Color.BLACK);
-			text_stats[x].setEditable(false);
-			text_stats[x].setBounds(18 + WINDOW_X + 124*x, 173, 117, 300);
-			text_stats[x].setHighlighter(null);
-			text_stats[x].setFont(new Font("Roboto", Font.PLAIN, 12));
-			text_stats[x].setBackground(null);
-			text_stats[x].setOpaque(false);  
-			text_stats[x].setBorder(null); 
-			text_stats[x].setText(" 1 \n\n 2 \n\n 3 \n\n 4 \n\n 5 \n\n 6 \n\n 7 \n\n 8 \n\n 9 \n\n 10");
-		}
+		text_stats[x].setForeground(Color.BLACK);
+		text_stats[x].setEditable(false);
+		text_stats[x].setBounds(18 + WINDOW_X + 124*x, 173, 117, 300);
+		text_stats[x].setHighlighter(null);
+		text_stats[x].setFont(new Font("Roboto", Font.PLAIN, 12));
+		text_stats[x].setBackground(null);
+		text_stats[x].setOpaque(false);  
+		text_stats[x].setBorder(null); 
+		text_stats[x].setText(" 1 \n\n 2 \n\n 3 \n\n 4 \n\n 5 \n\n 6 \n\n 7 \n\n 8 \n\n 9 \n\n 10"); }
 		text_warning.setBounds(100 + WINDOW_X, 415, 250, 100);
 		text_warning.setForeground(Color.RED);
 		text_warning.setBackground(null);
@@ -210,23 +217,14 @@ public class UserDisplay {
 		text_warning.setOpaque(false);  
 		text_warning.setBorder(null); 
 		text_warning.setVisible(false);
-		
-		// - - - - - P R O G R E S S  B A R S - - - - -
-		//BufferedImage img = null;
-		//try {img = ImageIO.read(new File("src/resources/progress_play_fill.png"));} catch (IOException e) {e.printStackTrace();}
-		//Image dimg = img.getScaledInstance(100, 22, 4);
-		//progress_play_fill = new JLabel(new ImageIcon(dimg));
-		//progress_play_fill.setBounds(133 + WINDOW_X, 570, 100, 22);
-		
+
 		// - - - - - S C E N E S - - - - -
 		scene_logo.setBounds(0, 0, WINDOW_X, WINDOW_Y);
 		scene_menu.setBounds(0, 0, WINDOW_X, WINDOW_Y);
-		scene_play.setBounds(WINDOW_X, 0, WINDOW_X, WINDOW_Y);
+		scene_play.setBounds(0, 40, WINDOW_X, WINDOW_Y);
 		scene_about.setBounds(WINDOW_X, 0, WINDOW_X, WINDOW_Y);
 		scene_stats.setBounds(WINDOW_X, 0, WINDOW_X, WINDOW_Y);
 		scene_options.setBounds(WINDOW_X, 0, WINDOW_X, WINDOW_Y);
-		scene_background_1.setBounds(0, 0, WINDOW_X, WINDOW_Y);
-		scene_background_2.setBounds(0, WINDOW_Y, WINDOW_X, WINDOW_Y);
 		
 		// - - - - - F R A M E - - - - -
 		frame_main.setTitle("Munch");
@@ -236,46 +234,74 @@ public class UserDisplay {
 		frame_main.setLocationRelativeTo(null);
 		frame_main.setLayout(null);
 		frame_main.setResizable(false);
-		frame_main.getContentPane().add(panel_game);
-		frame_main.getContentPane().add(panel_menu);
-		for(JComponent c : game_components) panel_menu.add(c);
-		for(JComponent c : menu_components) panel_menu.add(c);
+		frame_main.getContentPane().add(panel_main);
+		for(JComponent c : game_components) panel_main.add(c);
+		for(JComponent c : menu_components) panel_main.add(c);
 		frame_main.setVisible(true);
 
 		// - - - - - A C T I O N  M A P S - - - - -
-		Options.toggleControlScheme(panel_game, toggle_game_controls);
+		if (!Options.arrowMovement) {
+			InputMap in = panel_main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+			ActionMap am = panel_main.getActionMap();
+			in.put(KeyStroke.getKeyStroke('a'), "doA_Pressed");
+			am.put("doA_Pressed", new InputController.A_Pressed());
+			in.put(KeyStroke.getKeyStroke('d'), "doD_Pressed");
+			am.put("doD_Pressed", new InputController.D_Pressed());
+			in.put(KeyStroke.getKeyStroke('s'), "doS_Pressed");
+			am.put("doS_Pressed", new InputController.S_Pressed());
+			in.put(KeyStroke.getKeyStroke('w'), "doW_Pressed");
+			am.put("doW_Pressed", new InputController.W_Pressed());
+			in.put(KeyStroke.getKeyStroke('w'), "doP_Pressed");
+			am.put("doP_Pressed", new InputController.P_Pressed());
+		} else {
+			InputMap in = panel_main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+			ActionMap am = panel_main.getActionMap();
+			in.put(KeyStroke.getKeyStroke("LEFT"), "doA_Pressed");
+			am.put("doA_Pressed", new InputController.A_Pressed());
+			in.put(KeyStroke.getKeyStroke("RIGHT"), "doD_Pressed");
+			am.put("doD_Pressed", new InputController.D_Pressed());
+			in.put(KeyStroke.getKeyStroke('s'), "doS_Pressed");
+			am.put("doS_Pressed", new InputController.S_Pressed());
+			in.put(KeyStroke.getKeyStroke('w'), "doW_Pressed");
+			am.put("doW_Pressed", new InputController.W_Pressed());
+			in.put(KeyStroke.getKeyStroke('p'), "doP_Pressed");
+			am.put("doP_Pressed", new InputController.P_Pressed());
+		}
 		
-		panel_menu.setVisible(true);
 		runLogoScene();
 	}
 	
 	public void runMenuScene(){
 		SoundBank.sound_play_menu_swipe();
 			 if(openScene == "logo"){
-			//placeholder - organizational purposes
 		} 
 		else if(openScene == "play"){
 			new Thread() {
 				public void run() {
-					Player.playing = false;
-					openScene = "menu";
-					//backgroundSlideTimer();
+					if (!Player.isAlive()) toggleGameOverPopup();
+					MainPanel.setPlaying(false);
+					Player.player1.setLocation(0, 1000);
+					Entity.entities.remove(Player.player1);
+					GameClocks.stopSpawnClock();
+					GameClocks.stopBubbleClock();
+					boolean playBarsStillVisible = Player.isAlive();
 					for(int x = 0; x < 200; x++) {
 						button_play.setLocation(button_play.getX()+2, button_play.getY());
 						button_stats.setLocation(button_stats.getX()+2, button_stats.getY());
 						button_about.setLocation(button_about.getX()+2, button_about.getY());
 						button_options.setLocation(button_options.getX()+2, button_options.getY());
 						scene_menu.setLocation(scene_menu.getX()+2, scene_menu.getY());
-						scene_background_1.setLocation(scene_background_1.getX()+2, scene_menu.getY());
-						scene_background_2.setLocation(scene_background_2.getX()+2, scene_background_2.getY());
-						for(JComponent c : game_components) c.setLocation(c.getX()+2, c.getY());
+						if (x < 40 && playBarsStillVisible) {
+							for(JComponent c : game_components) 
+								c.setLocation(c.getX(), c.getY() + 1);
+							text_score.setLocation(text_score.getX(), text_score.getY() - 1);
+						}
 						try{Thread.sleep(1);} catch (InterruptedException ex) {}
 					}
-					Statistics.addStat(Player.p.getScore());
+					if (Options.difficulty == 0) scene_play.setLocation(scene_play.getX(), scene_play.getY()+1);
+					Statistics.addStat(Player.player1.getScore());
 					// SoundBank.sound_play_theme();
-					GameClocks.stopSpawnClock();
-					GameClocks.stopBubbleClock();
-					panel_game.requestFocus();
+					panel_main.requestFocus();
 				}
 			}.start();
 		}
@@ -331,6 +357,7 @@ public class UserDisplay {
 		else if(openScene == "options"){
 			new Thread(){
 				public void run(){
+					text_warning.setVisible(false);
 					for(int x = 0; x < 100; x++){
 						scene_options.setLocation(scene_options.getX()+4, scene_options.getY());
 						button_back.setLocation(button_back.getX()+4, button_back.getY());
@@ -342,7 +369,6 @@ public class UserDisplay {
 						toggle_game_difficulty[1].setLocation(toggle_game_difficulty[1].getX()+4, toggle_game_difficulty[1].getY());
 						toggle_game_difficulty[2].setLocation(toggle_game_difficulty[2].getX()+4, toggle_game_difficulty[2].getY());
 						toggle_game_difficulty[3].setLocation(toggle_game_difficulty[3].getX()+4, toggle_game_difficulty[3].getY());
-						text_warning.setLocation(text_warning.getX()+4, text_warning.getY());
 						try{Thread.sleep(1);} catch(InterruptedException ex){}
 					}
 					for(int x = 0; x < 71; x++){
@@ -355,7 +381,8 @@ public class UserDisplay {
 						button_about.setLocation(button_about.getX()+3, button_about.getY());
 						try{Thread.sleep(1);} catch(InterruptedException ex){}
 					}	
-					text_warning.setVisible(false);
+					if (Options.reset) Statistics.reset();
+					Options.reset = false;
 					toggle_stats_reset.setSelected(false);
 				}
 			}.start();
@@ -367,12 +394,14 @@ public class UserDisplay {
 		button_options.setEnabled(true);
 		button_stats.setEnabled(true);
 	}
+	
 	public void runPlayScene(){
-		//openScene = "play";
+		openScene = "play";
 		new Thread() {
 			public void run() {
 				Food.clearFood();
-				Player.p = new Player();
+				Player.player1 = new Player();
+				MainPanel.setPlaying(true);
 				text_score.setText("Score: 0");	
 				button_play.setEnabled(false);
 				button_about.setEnabled(false);
@@ -384,22 +413,18 @@ public class UserDisplay {
 					button_about.setLocation(button_about.getX() - 2, button_about.getY());
 					button_options.setLocation(button_options.getX() - 2, button_options.getY());
 					scene_menu.setLocation(scene_menu.getX() - 2, scene_menu.getY());
-					scene_background_1.setLocation(scene_background_1.getX() - 2, scene_menu.getY());
-					scene_background_2.setLocation(scene_background_2.getX() - 2, scene_background_2.getY());
-					for(JComponent c : game_components) c.setLocation(c.getX() - 2, c.getY());
+					if (x >= 160) {
+						for(JComponent c : game_components)
+							c.setLocation(c.getX(), c.getY() - 1);
+						text_score.setLocation(text_score.getX(), text_score.getY() + 1);
+					}
 					try{Thread.sleep(1);} catch (InterruptedException ex) {}
 				}
-				// SoundBank.sound_play_simpleTheme();
+				if (Options.difficulty == 0) scene_play.setLocation(scene_play.getX(), scene_play.getY()-1);
 				GameClocks.startSpawnClock();
 				GameClocks.startBubbleClock();
-				for (int x = 0; x < 300 / GameClocks.movementSpeed; x++) {
-					Player.p.setY(Player.p.getY() + GameClocks.movementSpeed/2);
-					try{Thread.sleep(10);} catch (InterruptedException ex) {}
-				}
-				openScene = "play";
-				Player.playing = true;
-				panel_game.requestFocusInWindow();
-				GamePanel.scrolling = true;
+				panel_main.requestFocusInWindow();
+				MainPanel.scrolling = true;
 			}
 		}.start();
 	}
@@ -407,9 +432,9 @@ public class UserDisplay {
 		openScene = "stats";
 		new Thread(){
 			public void run(){
-				//15 x 99 @ 216=y
 				SoundBank.sound_play_menu_swipe();
-				updateRecentStats();
+				if (Options.stats_top) updateTopStats();
+				else updateRecentStats();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
 				button_about.setEnabled(false);
@@ -445,7 +470,6 @@ public class UserDisplay {
 		openScene = "about";
 		new Thread(){
 			public void run(){
-				//15 x 99 @ 216=y
 				SoundBank.sound_play_menu_swipe();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
@@ -474,7 +498,6 @@ public class UserDisplay {
 		openScene = "options";
 		new Thread(){
 			public void run(){
-				//15 x 99 @ 312=y
 				SoundBank.sound_play_menu_swipe();
 				button_back.setEnabled(true);
 				button_play.setEnabled(false);
@@ -512,7 +535,6 @@ public class UserDisplay {
 		openScene = "logo";
 		new Thread(){
 			public void run(){
-				//backgroundSlideTimer();
 				button_play.setVisible(false);
 				button_stats.setVisible(false);
 				button_about.setVisible(false);
@@ -523,20 +545,42 @@ public class UserDisplay {
 				scene_logo.setVisible(true);
 				try{Thread.sleep(2500);}catch(InterruptedException ex){}
 				scene_logo.setVisible(false);
-				try{Thread.sleep(800);}catch(InterruptedException ex){}
+				try{Thread.sleep(400);}catch(InterruptedException ex){}
 				scene_menu.setVisible(true);
 				button_play.setVisible(true);
 				button_stats.setVisible(true);
 				button_about.setVisible(true);
 				button_options.setVisible(true);
+				SoundBank.sound_play_theme();
 				runMenuScene();
 			}
 		}.start();
 	}
 	
+	// BELOW METHODS ARE FOR INTERFACE BUTTON USER
+	// = = = = = = = = = = = = = = = = = = = = = =
 	public void setTextScore(int score){
-		text_score.setText("Score: " + Player.p.getScore());
+		text_score.setText("" + Player.player1.getScore());
 	}
+	
+	public void reload(){
+		new Thread() {
+			public void run() {
+				MainPanel.scrolling = false;
+				Food.clearFood();
+				Player.player1 = new Player();
+				MainPanel.setPlaying(true);
+				text_score.setText("Score: 0");	
+				// SoundBank.sound_play_simpleTheme();κκ
+				for (int x = 0; x < 300 / GameClocks.movementSpeed; x++) {
+					Player.player1.setY(Player.player1.getY() + GameClocks.movementSpeed/2);
+					try{Thread.sleep(10);} catch (InterruptedException ex) {}
+				}
+				MainPanel.scrolling = true;
+			}
+		}.start();
+	}
+	
 	public void switchStatsPage(){
 		Options.stats_top = !Options.stats_top;
 		button_stats_top.setEnabled(!Options.stats_top);
@@ -544,46 +588,7 @@ public class UserDisplay {
 		if(Options.stats_top) updateTopStats();
 		else updateRecentStats();
 	}
-	public void backgroundSlideTimer(){
-		new Thread(){
-			public void run(){
-				while(openScene != "play"){
-					slideBackground();
-					try{Thread.sleep(25);} catch(InterruptedException ex){}
-				}
-			}
-		}.start();
-	}
-	public void reload(){
-		new Thread() {
-			public void run() {
-				GamePanel.scrolling = false;
-				Food.clearFood();
-				Player.p = new Player();
-				Player.playing = true;
-				text_score.setText("Score: 0");	
-				// SoundBank.sound_play_simpleTheme();κ
-				for (int x = 0; x < 300 / GameClocks.movementSpeed; x++) {
-					Player.p.setY(Player.p.getY() + GameClocks.movementSpeed/2);
-					try{Thread.sleep(10);} catch (InterruptedException ex) {}
-				}
-				GamePanel.scrolling = true;
-			}
-		}.start();
-	}
 	
-	public void slideBackground(){
-		int amount = 0;
-		if(openScene != "play") 
-			amount = 1;
-		else amount = GameClocks.movementSpeed;
-		scene_background_1.setLocation(scene_background_1.getX(), scene_background_1.getY()-amount);
-		scene_background_2.setLocation(scene_background_2.getX(), scene_background_2.getY()-amount);
-		if(scene_background_1.getY()+scene_background_1.getHeight() < 1) 
-			scene_background_1.setLocation(scene_background_1.getX(), scene_background_2.getY() + scene_background_2.getHeight());
-		if(scene_background_2.getY()+scene_background_2.getHeight() < 1) 
-			scene_background_2.setLocation(scene_background_2.getX(), scene_background_1.getY() + scene_background_1.getHeight());
-	}
 	public void updateRecentStats(){
 		int capacity = 0; // out of 10
 		Scanner sc = new Scanner(Statistics.getRecentRecords());
@@ -602,6 +607,7 @@ public class UserDisplay {
 			capacity = 0;
 		}
 	}
+	
 	public void updateTopStats(){
 		int capacity = 1; // out of 10
 		Scanner sc = new Scanner(Statistics.getTopRecords());
@@ -619,8 +625,43 @@ public class UserDisplay {
 		text_stats[1].setText(stringBuilder.toString());
 		text_stats[2].setText("");
 	}
+	
 	public void resetStats(){
+		Options.reset = true;
 		if(text_warning.isVisible()) text_warning.setVisible(false);
 		else text_warning.setVisible(true);
+	}
+	
+	public void toggleGameOverPopup(){
+		if (popup_gameover.getY() < 0){
+			new Thread(){
+				public void run(){
+					text_score.setLocation(WINDOW_X/2 - 10, -55);
+					for(int x = 0; x < 70; x++){
+						popup_gameover.setLocation(popup_gameover.getX(), popup_gameover.getY() + 5);
+						popup_gameover_button_back.setLocation(popup_gameover_button_back.getX(), popup_gameover_button_back.getY() + 5);
+						text_score.setLocation(text_score.getX(), text_score.getY() + 5);
+						if (x < 40){
+							for (Component c : game_components)
+								c.setLocation(c.getX(), c.getY()+1);
+						}
+						try{Thread.sleep(1);} catch(InterruptedException ex){}
+					}
+				}
+			}.start();
+		} else {
+			new Thread(){
+				public void run(){
+					for(int x = 0; x < 70; x++){
+						popup_gameover.setLocation(popup_gameover.getX(), popup_gameover.getY() - 5);
+						popup_gameover_button_back.setLocation(popup_gameover_button_back.getX(), popup_gameover_button_back.getY() - 5);
+						text_score.setLocation(text_score.getX(), text_score.getY() - 5);
+						try{Thread.sleep(1);} catch(InterruptedException ex){}
+					}
+					text_score.setLocation(7, 7 - 40);
+
+				}
+			}.start();
+		}
 	}
 }

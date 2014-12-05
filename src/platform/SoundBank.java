@@ -1,6 +1,7 @@
 package platform;
 
 import java.io.*;
+
 import javax.sound.sampled.*;
 
 import ui.Options;
@@ -10,6 +11,7 @@ public class SoundBank {
 	public SoundBank(){
 		
 	}	
+	
 	public static void sound_play_eat(){
 		if (Options.effectsSound)
 			try {
@@ -43,115 +45,84 @@ public class SoundBank {
 				exc.printStackTrace(System.out);
 			}
 	}
-	public static void sound_play_theme(){
-		if (Options.musicSound)
-			new Thread() {
-				public void run() {
-					int total, totalToRead, numBytesRead, numBytesToRead;
-					byte[] buffer;
-					boolean stopped;
-					AudioFormat wav;
-					TargetDataLine line;
-					SourceDataLine lineIn;
-					DataLine.Info info;
-					File file;
-					FileInputStream fis;
+	
+	// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+	
+	static boolean play_theme = false;
+	static AudioFormat audioFormat;
+	static AudioInputStream audioInputStream;
+	static SourceDataLine theme_sourceDataLine;
 
-					// AudioFormat(float sampleRate, int sampleSizeInBits,
-					// int channels, boolean signed, boolean bigEndian)
-					wav = new AudioFormat(44100, 8, 2, false, false);
-					info = new DataLine.Info(SourceDataLine.class, wav);
-
-					buffer = new byte[1024 * 333];
-					numBytesToRead = 1024 * 333;
-					total = 0;
-					stopped = false;
-
-					if (!AudioSystem.isLineSupported(info)) {
-						System.out.print("no support for " + wav.toString());
+	static public void sound_play_theme_simple() {
+		if (Options.musicSound){
+			try {
+				File soundFile = new File("src/resources/sound_theme_simple.wav");
+				audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+				audioFormat = audioInputStream.getFormat();
+				DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
+				theme_sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+				play_theme = true;
+				new Thread() {
+					byte tempBuffer[] = new byte[10000];
+					public void run() {
+						try {
+							theme_sourceDataLine.open(audioFormat);
+							theme_sourceDataLine.start();
+							int cnt;
+							while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1
+									&& play_theme == true) {
+								if (cnt > 0) {
+									theme_sourceDataLine.write(tempBuffer, 0, cnt);
+								}
+							}
+							theme_sourceDataLine.drain();
+							theme_sourceDataLine.close();
+							play_theme = false;
+						} catch (Exception e) { e.printStackTrace(); }
 					}
-					try {
-						// Obtain and open the line.
-						lineIn = (SourceDataLine) AudioSystem.getLine(info);
-						lineIn.open(wav);
-						lineIn.start();
-						fis = new FileInputStream(file = new File(
-								"src/resources/sound_theme.wav"));
-						totalToRead = fis.available();
-
-						while (total < totalToRead && !stopped) {
-							numBytesRead = fis.read(buffer, 0, numBytesToRead);
-							if (numBytesRead == -1)
-								break;
-							total += numBytesRead;
-							lineIn.write(buffer, 0, numBytesRead);
-						}
-
-					} catch (LineUnavailableException ex) {
-						ex.printStackTrace();
-					} catch (FileNotFoundException nofile) {
-						nofile.printStackTrace();
-					} catch (IOException io) {
-						io.printStackTrace();
-					}
-				}
-			}.start();
+				}.start();
+			} catch (Exception e) { e.printStackTrace(); }
+		}
 	}
-	public static void sound_play_simpleTheme(){
-		if (Options.musicSound)
-			new Thread() {
-				public void run() {
-					int total, totalToRead, numBytesRead, numBytesToRead;
-					byte[] buffer;
-					boolean stopped;
-					AudioFormat wav;
-					TargetDataLine line;
-					SourceDataLine lineIn;
-					DataLine.Info info;
-					File file;
-					FileInputStream fis;
-
-					// AudioFormat(float sampleRate, int sampleSizeInBits,
-					// int channels, boolean signed, boolean bigEndian)
-					wav = new AudioFormat(44100, 8, 2, false, false);
-					info = new DataLine.Info(SourceDataLine.class, wav);
-
-					buffer = new byte[1024 * 333];
-					numBytesToRead = 1024 * 333;
-					total = 0;
-					stopped = false;
-
-					if (!AudioSystem.isLineSupported(info)) {
-						System.out.print("no support for " + wav.toString());
-					}
-					try {
-						// Obtain and open the line.
-						lineIn = (SourceDataLine) AudioSystem.getLine(info);
-						lineIn.open(wav);
-						lineIn.start();
-						fis = new FileInputStream(file = new File(
-								"src/resources/sound_theme_simple.wav"));
-						totalToRead = fis.available();
-
-						while (total < totalToRead && !stopped) {
-							numBytesRead = fis.read(buffer, 0, numBytesToRead);
-							if (numBytesRead == -1)
-								break;
-							total += numBytesRead;
-							lineIn.write(buffer, 0, numBytesRead);
-						}
-
-					} catch (LineUnavailableException ex) {
-						ex.printStackTrace();
-					} catch (FileNotFoundException nofile) {
-						nofile.printStackTrace();
-					} catch (IOException io) {
-						io.printStackTrace();
-					}
-				}
-			}.start();
+	static public void sound_stop_theme_simple() {
+		play_theme = false;
 	}
+	
+	static public void sound_play_theme() {
+		if (Options.musicSound){
+			try {
+				File soundFile = new File("src/resources/sound_ambience.wav");
+				audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+				audioFormat = audioInputStream.getFormat();
+				DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
+				theme_sourceDataLine = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+				play_theme = true;
+				new Thread() {
+					byte tempBuffer[] = new byte[10000];
+					public void run() {
+						try {
+							theme_sourceDataLine.open(audioFormat);
+							theme_sourceDataLine.start();
 
+							int cnt;
+							while ((cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length)) != -1
+									&& play_theme == true) {
+								if (cnt > 0) {
+									theme_sourceDataLine.write(tempBuffer, 0, cnt);
+								}
+							}
+							theme_sourceDataLine.drain();
+							theme_sourceDataLine.close();
+							play_theme = false;
+						} catch (Exception e) { e.printStackTrace(); }
+					}
+				}.start();
+			} catch (Exception e) { e.printStackTrace(); }
+		}
+	}
+	static public void sound_stop_theme() {
+		play_theme = false;
+	}
 }
 
 
